@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from cohere import Client as CohereClient
 from time import perf_counter
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -16,12 +17,17 @@ cohere_api_key = os.getenv("COHERE_API_KEY", "")
 openai_client = OpenAI(api_key=openai_api_key)
 cohere_client = CohereClient(cohere_api_key)
 
+class QuizItem(BaseModel):
+    question: str
+    options: List[str]
+    answer_index: int
+
 class Node(BaseModel):
     id: int
     label: str
     weight: int
     summary: str
-
+    quiz: List[QuizItem]
 class Link(BaseModel):
     source: int
     target: int
@@ -58,30 +64,22 @@ You are an AI assistant whose sole job is to convert a lecture transcript into a
      • `weight`: 0.1–1.0 reflecting strength.  
      • `relation`: a concise verb phrase (e.g. “is an example of”, “builds on”, “contrasts with”).
 
-5. **Return Strict JSON Only**  
-   – Respond with exactly one JSON object containing two arrays:  
-     ```jsonc
-     {
-       "nodes": [ /* Node objects */ ],
-       "links": [ /* Link objects */ ]
-     }
-     ```  
-   – Do **not** include any extra text, markdown, or code fences.
+5. **Generate Quiz Questions**  
+   – For each node, generate 3 to 5 **multiple choice questions** based only on the transcript's content.  
+   – Each question must include:  
+     • `question`: a clear and specific question about the concept.  
+     • `options`: an array of 4 plausible choices.  
+     • `answer_index`: the 0-based index of the correct answer in the options.
 
-Example structure (no content limit implied):
-```jsonc
-{
-  "nodes": [
-    { "id": 1, "label": "Core Topic",   "weight": 9, "summary": "…” },
-    { "id": 2, "label": "Subtopic A",   "weight": 5, "summary": "…” },
-    { "id": 3, "label": "Subtopic B.1", "weight": 3, "summary": "…” }
-  ],
-  "links": [
-    { "source": 1, "target": 2, "weight": 0.8, "relation": "includes example" },
-    { "source": 2, "target": 3, "weight": 0.6, "relation": "is part of" }
-  ]
-}
+6. **Return Strict JSON Only**  
+   – Respond with exactly one JSON object containing:  
+     {
+       "nodes": [ { "id": ..., "label": ..., "weight": ..., "summary": ..., "quiz": [ { "question": ..., "options": [...], "answer_index": ... } ] } ],
+       "links": [ { "source": ..., "target": ..., "weight": ..., "relation": ... } ]
+     }  
+   – Do **not** include any extra text, markdown, or code fences.
 """
+
 
 def call_llm(prompt: str, provider="openai") -> str:
     if provider == "openai":
@@ -122,6 +120,14 @@ def parse_graph_json(raw: str) -> GraphResponse:
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -131,7 +137,7 @@ def extract_graph(req: GraphRequest):
     start = perf_counter()
 
     prompt = f"{system_prompt}\n\nTranscript:\n\"\"\"\n{req.transcript}\n\"\"\""
-    raw = call_llm(prompt, provider="openai")  # Change to "cohere" to test fallback
+    raw = call_llm(prompt, provider="openai")
     graph = parse_graph_json(raw)
 
     elapsed = perf_counter() - start
