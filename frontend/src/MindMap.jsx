@@ -5,18 +5,21 @@ export default function MindMap({ graph }) {
   const containerRef = useRef(null)
 
   useEffect(() => {
-    if (!containerRef.current || !graph) return
+    if (!containerRef.current || !graph || !graph.nodes || !graph.links) {
+      console.log('Missing required graph data:', { graph });
+      return;
+    }
 
     const nodes = new DataSet(
       graph.nodes.map((n) => ({
         id: n.id,
         label: n.label,
         value: n.weight,
-        title: `${n.summary}\n\nQuiz Questions:\n${n.quiz.map((q, i) =>
+        title: `${n.summary}\n\nQuiz Questions:\n${n.quiz?.map((q, i) =>
           `Q${i + 1}: ${q.question}\n${q.options.map((opt, j) =>
             `${j === q.answer_index ? '✓' : ' '} ${opt}`
           ).join('\n')}`
-        ).join('\n\n')}`,
+        ).join('\n\n') || 'No quiz available'}`,
         font: {
           size: 16,
           face: 'arial',
@@ -31,12 +34,13 @@ export default function MindMap({ graph }) {
         from: l.source,
         to: l.target,
         value: l.weight,
-        title: l.relation,  // Show relation on hover
-        width: l.weight * 2,  // Edge width based on weight
-        color: {
-          color: '#97C2FC',
-          highlight: '#7AA3E5',
-          hover: '#7AA3E5',
+        arrows: 'to',
+        title: l.relation,
+        label: l.relation,
+        font: {
+          size: 12,
+          align: 'middle',
+          face: 'arial'
         }
       }))
     )
@@ -112,10 +116,10 @@ export default function MindMap({ graph }) {
         arrows: {
           to: {
             enabled: true,
-            scaleFactor: 0.5,
+            scaleFactor: 0.2,
             type: 'arrow'
           }
-        }
+        },
       },
       interaction: {
         hover: true,
