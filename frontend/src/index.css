@@ -21,7 +21,7 @@ body {
 /* Optional: links (if not using Tailwind classes) */
 a {
   color: #3b82f6; /* Tailwind blue-500 */
-  text-decoration: none;
+  text-decoration: none; 
   font-weight: 500;
 }
 a:hover {
@@ -29,6 +29,6 @@ a:hover {
 }
 
 /* Optional: base style if you use native <button> often */
-button {
+.button {
   @apply rounded-md px-4 py-2 font-medium text-white bg-amber-400 hover:bg-blue-700 transition;
 }

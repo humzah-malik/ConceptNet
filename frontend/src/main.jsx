@@ -3,7 +3,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import App from './App.jsx'
-import UploadPage from './UploadPage.jsx'
+import NewMap from './NewMap.jsx'
+import MapView from './MapView.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -11,7 +12,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/upload" element={<UploadPage />} />
+        <Route path="/newmap" element={<NewMap />} />
+        <Route path="/map" element={<MapView />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
