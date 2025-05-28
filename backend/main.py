@@ -12,6 +12,7 @@ from supabase import create_client, Client
 import hashlib
 import asyncio
 import fitz # PyMuPDF
+from docx import Document
 
 load_dotenv()
 
@@ -213,6 +214,28 @@ async def upload_pdf(file: UploadFile = File(...)):
     except Exception as e:
         print(f"PDF upload error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to process PDF.")
+
+@app.post("/upload-docx")
+async def upload_docx(file: UploadFile = File(...)):
+    try:
+        if not file.filename.endswith(".docx"):
+            raise HTTPException(status_code=400, detail="Invalid file type. Upload a .docx file.")
+
+        file_location = f"/tmp/{file.filename}"
+        with open(file_location, "wb") as f:
+            f.write(await file.read())
+
+        doc = Document(file_location)
+        text = "\n".join([para.text for para in doc.paragraphs])
+
+        if not text.strip():
+            raise HTTPException(status_code=400, detail="No extractable text found in DOCX.")
+
+        return {"transcript": text}
+
+    except Exception as e:
+        print(f"DOCX upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process DOCX.")
 
 @app.post("/store-graph")
 async def store_graph(req: GraphRequest):
