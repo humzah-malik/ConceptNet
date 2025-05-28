@@ -1,7 +1,7 @@
 import os
 import json
 from typing import List, Dict
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from supabase import create_client, Client
 import hashlib
 import asyncio
+import fitz # PyMuPDF
 
 load_dotenv()
 
@@ -114,7 +115,7 @@ Input will be a transcript and list of nodes. Return ONLY a JSON object:
   "node_quizzes": {
     "node_id": [
       {
-        "question": "thought-provoking question",
+        "question": "thought-provoking question, or a straight forward question depending on the concept",
         "options": ["correct answer", "plausible wrong answer", ...],
         "answer_index": correct_index
       },
@@ -190,6 +191,29 @@ app = FastAPI()
 def get_hash(transcript: str) -> str:
     return hashlib.sha256(transcript.encode()).hexdigest()
 
+@app.post("/upload-pdf")
+async def upload_pdf(file: UploadFile = File(...)):
+    try:
+        if not file.filename.endswith(".pdf"):
+            raise HTTPException(status_code=400, detail="Invalid file type. Upload a PDF.")
+
+        file_location = f"/tmp/{file.filename}"
+        with open(file_location, "wb") as f:
+            f.write(await file.read())
+
+        doc = fitz.open(file_location)
+        text = "\n".join([page.get_text() for page in doc])
+        doc.close()
+
+        if not text.strip():
+            raise HTTPException(status_code=400, detail="No extractable text found in PDF.")
+
+        return {"transcript": text}
+    
+    except Exception as e:
+        print(f"PDF upload error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to process PDF.")
+
 @app.post("/store-graph")
 async def store_graph(req: GraphRequest):
     try:
@@ -224,11 +248,10 @@ async def store_graph(req: GraphRequest):
             print("3. Stored in Supabase successfully")
         except Exception as supabase_error:
             print(f"Supabase error: {str(supabase_error)}")
-            # Continue even if Supabase fails - return the graph anyway
 
         elapsed = perf_counter() - start
-        print(f"⏱️ Total processing time: {elapsed:.2f} seconds")
-        print(f"📈 Nodes: {len(graph_data['nodes'])}, Links: {len(graph_data['links'])}")
+        print(f"Total processing time: {elapsed:.2f} seconds")
+        print(f"Nodes: {len(graph_data['nodes'])}, Links: {len(graph_data['links'])}")
 
         return graph_data
     except Exception as e:
@@ -253,22 +276,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
-@app.post("/extract-graph", response_model=GraphResponse)
-def extract_graph(req: GraphRequest):
-    start = perf_counter()
-
-    prompt = f"{system_prompt}\n\nTranscript:\n\"\"\"\n{req.transcript}\n\"\"\""
-    raw = call_llm(prompt, provider="openai")
-    graph = parse_graph_json(raw)
-
-    elapsed = perf_counter() - start
-    print(f"⏱️ LLM processing time: {elapsed:.2f} seconds")
-    print(f"📈 Nodes: {len(graph.nodes)}, Links: {len(graph.links)}")
-    print(f"✅ Graph generated in {elapsed:.2f}s with {len(graph.nodes)} nodes")
-
-    return graph

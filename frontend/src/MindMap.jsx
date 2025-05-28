@@ -157,7 +157,7 @@ export default function MindMap({ graph }) {
   return (
     <div
       ref={containerRef}
-      className="w-full h-[650px] bg-white rounded-md border shadow"
+      className="w-full h-[800px] bg-white rounded-md border shadow"
     />
   )
 }
