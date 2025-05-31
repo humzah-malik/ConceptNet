@@ -100,18 +100,59 @@ export default function MapView() {
 
       {/* Quiz Analytics Panel */}
       <div className="absolute top-44 left-4 w-64 z-50 bg-white border rounded-md shadow-md p-4">
-        <h2 className="text-md font-semibold mb-2 text-gray-800">Quiz Analytics</h2>
-        <div className="space-y-2 text-sm text-gray-700 max-h-64 overflow-y-auto">
-          {Object.entries(quizStats?.[id] || {}).map(([nodeId, data]) => (
-            <div key={nodeId} className="border-b pb-1">
-              <p className="font-medium">{data.label}</p>
-              <p className="text-xs text-gray-500">
-                {data.correct} / {data.attempts} correct (
-                {Math.round((data.correct / data.attempts) * 100)}%)
-              </p>
+        <h2 className="text-md font-semibold mb-3 text-center text-gray-800">Quiz Analytics</h2>
+
+        {graph && (() => {
+          const nodeStats = quizStats?.[id] || {};
+          const allStats = Object.values(nodeStats);
+          const totalAttempts = allStats.reduce((sum, s) => sum + s.attempts, 0);
+          const totalCorrect = allStats.reduce((sum, s) => sum + s.correct, 0);
+
+          const topNodes = Object.entries(nodeStats)
+            .map(([nodeId, stat]) => {
+              const nodeLabel = graph.nodes.find(n => n.id == nodeId)?.label || 'Unknown';
+              return { ...stat, label: nodeLabel };
+            })
+            .sort((a, b) => (b.correct / b.attempts) - (a.correct / a.attempts))
+            .slice(0, 3);
+
+          return (
+            <div className="text-sm text-gray-700 space-y-3">
+              {/* Total Score */}
+              <div>
+                <p className="font-medium">Total Score</p>
+                <div className="w-full h-2 bg-gray-200 rounded overflow-hidden mb-1">
+                  <div
+                    className="h-full bg-indigo-500"
+                    style={{ width: totalAttempts > 0 ? `${(totalCorrect / totalAttempts) * 100}%` : '0%' }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  {totalCorrect} / {totalAttempts} correct ({totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0}%)
+                </p>
+              </div>
+
+              {/* Section Heading */}
+              <p className="text-xs text-center font-semibold text-gray-500 mt-2">Top 3 Topics</p>
+
+              {/* Top Nodes */}
+              {topNodes.map((n, idx) => (
+                <div key={idx}>
+                  <p className="font-medium truncate">{n.label}</p>
+                  <div className="w-full h-2 bg-gray-200 rounded overflow-hidden mb-1">
+                    <div
+                      className="h-full bg-indigo-500"
+                      style={{ width: `${(n.correct / n.attempts) * 100}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {n.correct} / {n.attempts} correct ({Math.round((n.correct / n.attempts) * 100)}%)
+                  </p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          );
+        })()}
       </div>
 
       {/* Graph */}

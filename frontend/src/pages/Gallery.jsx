@@ -137,6 +137,7 @@ export default function Gallery() {
             {filtered.map(map => (
               <div
                 key={map.id}
+                onDoubleClick={() => navigate(`/map/${map.id}`)}
                 className="bg-white p-4 rounded shadow relative group flex flex-col justify-between"
               >
                 <div className="flex justify-between items-center mb-1">
@@ -167,12 +168,6 @@ export default function Gallery() {
 
                 {openMenuId === map.id && (
                   <div ref={el => (menuRefs.current[map.id] = el)} className="absolute top-0 left-full ml-2 bg-white border shadow-md rounded-md z-10 w-40 text-sm">
-                    <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                      onClick={() => navigate(`/map/${map.id}`)}
-                    >
-                      <HiEye className="inline mr-2" /> View
-                    </button>
                     <button
                       className="w-full text-left px-4 py-2 hover:bg-gray-100"
                       onClick={() => {

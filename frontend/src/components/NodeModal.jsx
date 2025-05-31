@@ -1,6 +1,6 @@
 // src/components/NodeModal.jsx
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   HiX,
@@ -15,10 +15,25 @@ export default function NodeModal({ node, onClose, graphId }) {
   const [currentQ, setCurrentQ] = useState(0)
   const [selected, setSelected] = useState(null)
   const [submitted, setSubmitted] = useState(false)
+  const [shuffledQuestion, setShuffledQuestion] = useState(null)
+
+  useEffect(() => {
+    if (stage === 'quiz') {
+      resetQuestion();
+    }
+  }, [currentQ, stage]);     
 
   const quiz = node.quiz || []
-  const question = quiz[currentQ]
-  const correctIndex = question?.answer_index
+  const question = shuffledQuestion;
+  const correctIndex = question?.answer_index;
+  const shuffleArray = (array) => {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  };
 
   const handleSubmit = () => {
     setSubmitted(true)
@@ -28,6 +43,21 @@ export default function NodeModal({ node, onClose, graphId }) {
   const resetQuestion = () => {
     setSubmitted(false)
     setSelected(null)
+  
+    // Take the “original” question from quiz[currentQ] and shuffle its options:
+    const original = quiz[currentQ]
+    if (original) {
+      const shuffled = shuffleArray(original.options)
+      // Find the new index of the correct answer string:
+      const newCorrectIndex = shuffled.findIndex(
+        opt => opt === original.options[original.answer_index]
+      )
+      setShuffledQuestion({
+        ...original,
+        options: shuffled,
+        answer_index: newCorrectIndex
+      })
+    }
   }
 
   const recordQuizResult = () => {
@@ -39,7 +69,7 @@ export default function NodeModal({ node, onClose, graphId }) {
   
     const nodeId = node.id;
     if (!stats[graphId][nodeId]) {
-      stats[graphId][nodeId] = { attempts: 0, correct: 0 };
+      stats[graphId][nodeId] = { attempts: 0, correct: 0, label: node.label };
     }
   
     stats[graphId][nodeId].attempts += 1;
@@ -80,16 +110,32 @@ export default function NodeModal({ node, onClose, graphId }) {
             <p className="text-gray-700 whitespace-pre-wrap mb-6">{node.summary}</p>
 
             {quiz.length > 0 && (
-              <button
-                onClick={() => {
-                  setStage('quiz')
-                  resetQuestion()
-                }}
-                className="ml-auto bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
-              >
-                Take Quiz
-              </button>
-            )}
+                <div className="flex items-center space-x-4 mt-4">
+                    <button
+                    onClick={() => {
+                        setStage('quiz')
+                    }}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition"
+                    >
+                    Take Quiz
+                    </button>
+
+                    {graphId && (() => {
+                    const stats = JSON.parse(localStorage.getItem("quizStats") || "{}");
+                    const nodeStats = stats[graphId]?.[node.id];
+                    if (!nodeStats) return null;
+
+                    const { correct, attempts } = nodeStats;
+                    const accuracy = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
+
+                    return (
+                        <span className="text-sm text-gray-500">
+                        {correct} / {attempts} correct ({accuracy}%)
+                        </span>
+                    );
+                    })()}
+                </div>
+                )}
           </div>
         )}
 
