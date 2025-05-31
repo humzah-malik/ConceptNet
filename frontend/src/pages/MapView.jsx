@@ -12,6 +12,8 @@ export default function MapView() {
   const [graph, setGraph] = useState(null);
   const [activeNode, setActiveNode] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const quizStats = JSON.parse(localStorage.getItem("quizStats") || "{}");
+
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
@@ -96,10 +98,26 @@ export default function MapView() {
         />
       </div>
 
+      {/* Quiz Analytics Panel */}
+      <div className="absolute top-44 left-4 w-64 z-50 bg-white border rounded-md shadow-md p-4">
+        <h2 className="text-md font-semibold mb-2 text-gray-800">Quiz Analytics</h2>
+        <div className="space-y-2 text-sm text-gray-700 max-h-64 overflow-y-auto">
+          {Object.entries(quizStats?.[id] || {}).map(([nodeId, data]) => (
+            <div key={nodeId} className="border-b pb-1">
+              <p className="font-medium">{data.label}</p>
+              <p className="text-xs text-gray-500">
+                {data.correct} / {data.attempts} correct (
+                {Math.round((data.correct / data.attempts) * 100)}%)
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Graph */}
       <div id="vis-graph" className="w-full h-full">
         {graph ? (
-          <MindMap graph={graph} onNodeClick={setActiveNode} searchTerm={searchTerm} />
+          <MindMap graph={graph} onNodeClick={setActiveNode} setGraph={setGraph} searchTerm={searchTerm} />
         ) : (
           <p className="text-center pt-20 text-gray-500">Map not found</p>
         )}
@@ -108,8 +126,10 @@ export default function MapView() {
           {activeNode && (
             <NodeModal
               key={activeNode.id}
+              graphId={id}
               node={activeNode}
               onClose={() => setActiveNode(null)}
+              mapId={id}
             />
           )}
         </AnimatePresence>

@@ -1,6 +1,6 @@
 import os
 import json
-from typing import List, Dict
+from typing import List, Dict, Optional
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -48,7 +48,8 @@ class Link(BaseModel):
     relation: str
 
 class GraphRequest(BaseModel):
-    transcript: str
+    transcript: Optional[str] = None
+    graph: Optional[Dict] = None
 
 class GraphResponse(BaseModel):
     nodes: List[Node]
@@ -241,42 +242,48 @@ async def upload_docx(file: UploadFile = File(...)):
 async def store_graph(req: GraphRequest):
     try:
         start = perf_counter()
-        print("1. Starting parallel graph generation...")
 
-        # Generate graph structure first
-        graph_data = await generate_graph_structure(openai_client, req.transcript)
-        
-        # Then generate summaries and quizzes in parallel
-        summary_task = generate_node_summaries(openai_client, req.transcript, graph_data["nodes"])
-        quiz_task = generate_quizzes(openai_client, req.transcript, graph_data["nodes"])
-        
-        summaries_data, quizzes_data = await asyncio.gather(summary_task, quiz_task)
-        
-        # Combine all data
-        for node in graph_data["nodes"]:
-            node_id = node["id"]
-            node["summary"] = summaries_data["node_summaries"].get(str(node_id), "")
-            node["quiz"] = quizzes_data["node_quizzes"].get(str(node_id), [])
+        transcript = req.transcript or (req.graph or {}).get("transcript")
+        if not transcript:
+            raise HTTPException(status_code=422, detail="transcript is required")
 
-        print("2. Graph generation complete")
-        
+        hash_id = get_hash(transcript)
+
+        if req.graph:
+            # Use provided graph
+            graph_data = req.graph
+            print("1. Using provided graph")
+        else:
+            # Default path: generate from scratch
+            print("1. Starting parallel graph generation...")
+            graph_data = await generate_graph_structure(openai_client, req.transcript)
+
+            summary_task = generate_node_summaries(openai_client, req.transcript, graph_data["nodes"])
+            quiz_task = generate_quizzes(openai_client, req.transcript, graph_data["nodes"])
+
+            summaries_data, quizzes_data = await asyncio.gather(summary_task, quiz_task)
+
+            for node in graph_data["nodes"]:
+                node_id = node["id"]
+                node["summary"] = summaries_data["node_summaries"].get(str(node_id), "")
+                node["quiz"] = quizzes_data["node_quizzes"].get(str(node_id), [])
+
+            print("2. Graph generation complete")
+
         # Store in Supabase
-        hash_id = get_hash(req.transcript)
-        try:
-            result = supabase.table("memory_graphs").upsert({
-                "hash": hash_id,
-                "transcript": req.transcript,
-                "graph_json": graph_data
-            }).execute()
-            print("3. Stored in Supabase successfully")
-        except Exception as supabase_error:
-            print(f"Supabase error: {str(supabase_error)}")
+        supabase.table("memory_graphs").upsert({
+            "hash": hash_id,
+            "transcript": req.transcript,
+            "graph_json": graph_data
+        }).execute()
+        print("3. Stored in Supabase successfully")
 
         elapsed = perf_counter() - start
         print(f"Total processing time: {elapsed:.2f} seconds")
         print(f"Nodes: {len(graph_data['nodes'])}, Links: {len(graph_data['links'])}")
 
         return graph_data
+
     except Exception as e:
         print(f"Error in store_graph: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to store graph: {str(e)}")

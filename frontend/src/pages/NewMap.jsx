@@ -102,7 +102,8 @@ export default function NewMap() {
 
     // STEP 4: Done!
     const mapId = hash
-    localStorage.setItem('latestGraph', JSON.stringify(graph))
+    const graphWithTranscript = { ...graph, transcript }
+    localStorage.setItem('latestGraph', JSON.stringify(graphWithTranscript))
 
     // Save to gallery
     const allMaps = JSON.parse(localStorage.getItem('galleryMaps') || '[]')
@@ -110,7 +111,7 @@ export default function NewMap() {
       id: mapId,
       title: `Map ${new Date().toLocaleString()}`,
       createdAt: Date.now(),
-      graph,
+      graph: graphWithTranscript,
     }
     const updatedMaps = [mapCard, ...allMaps.filter(m => m.id !== mapId)]
     localStorage.setItem('galleryMaps', JSON.stringify(updatedMaps))

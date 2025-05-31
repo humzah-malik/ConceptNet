@@ -22,13 +22,28 @@ export default function Gallery() {
   const [renderFormat, setRenderFormat] = useState(null);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
-    const withTitles = stored.map(m => ({
-      ...m,
-      title: m.graph?.nodes?.[0]?.label || m.title || 'Untitled Map',
-    }));
-    setMaps(withTitles);
-    setFiltered(withTitles);
+    (async () => {
+         const stored = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
+        
+         // ---- MIGRATION --------------------------------------------------------
+         const migrated = stored.map(m => {
+           if (m.graph && !m.graph.transcript) {
+             // we don't really need the real transcript – any non-empty string passes validation
+             return { ...m, graph: { ...m.graph, transcript: ' ' } };
+           }
+           return m;
+         });
+         // -----------------------------------------------------------------------
+        
+         const withTitles = migrated.map(m => ({
+           ...m,
+           title: m.graph?.nodes?.[0]?.label || m.title || 'Untitled Map',
+         }));
+        
+         setMaps(withTitles);
+         setFiltered(withTitles);
+         localStorage.setItem('galleryMaps', JSON.stringify(withTitles));   // persist migration
+         })();
   }, []);
 
   useEffect(() => {
@@ -67,8 +82,9 @@ export default function Gallery() {
   };
 
   const handleRename = (id) => {
-    const updated = maps.map(m => m.id === id ? { ...m, title: newTitle } : m);
+    const updated = maps.map(m => m.id === id ? { ...m, title: newTitle.trim() } : m);
     updateGallery(updated);
+    setNewTitle('');
     setEditingId(null);
   };
 

@@ -10,7 +10,7 @@ import {
   HiXCircle
 } from 'react-icons/hi'
 
-export default function NodeModal({ node, onClose }) {
+export default function NodeModal({ node, onClose, graphId }) {
   const [stage, setStage] = useState('summary')
   const [currentQ, setCurrentQ] = useState(0)
   const [selected, setSelected] = useState(null)
@@ -20,11 +20,35 @@ export default function NodeModal({ node, onClose }) {
   const question = quiz[currentQ]
   const correctIndex = question?.answer_index
 
-  const handleSubmit = () => setSubmitted(true)
+  const handleSubmit = () => {
+    setSubmitted(true)
+    recordQuizResult()
+  }
+
   const resetQuestion = () => {
     setSubmitted(false)
     setSelected(null)
   }
+
+  const recordQuizResult = () => {
+    const stats = JSON.parse(localStorage.getItem("quizStats") || "{}");
+  
+    if (!stats[graphId]) {
+      stats[graphId] = {};
+    }
+  
+    const nodeId = node.id;
+    if (!stats[graphId][nodeId]) {
+      stats[graphId][nodeId] = { attempts: 0, correct: 0 };
+    }
+  
+    stats[graphId][nodeId].attempts += 1;
+    if (selected === correctIndex) {
+      stats[graphId][nodeId].correct += 1;
+    }
+  
+    localStorage.setItem("quizStats", JSON.stringify(stats));
+  };    
 
   return (
     // Backdrop: clicking here calls onClose()

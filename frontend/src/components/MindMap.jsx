@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { DataSet, Network } from 'vis-network/standalone'
 
 // just below your imports:
@@ -10,11 +10,14 @@ const normalize = s =>
     .replace(/[^a-zA-Z0-9' ]/g, '') 
     .toLowerCase()
 
-export default function MindMap({ graph, onNodeClick, searchTerm }) {
+export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
   const containerRef = useRef(null)
   const networkRef = useRef(null)
   const originalDataRef = useRef(null)
-
+  const [editingNodeId, setEditingNodeId] = useState(null)
+  const [editingEdgeId, setEditingEdgeId] = useState(null)
+  const [newLabel, setNewLabel] = useState('')
+  
   // 1️⃣ Initial graph construction
   useEffect(() => {
     if (!containerRef.current || !graph?.nodes || !graph?.links) {
@@ -32,6 +35,7 @@ export default function MindMap({ graph, onNodeClick, searchTerm }) {
     )
     const edges = new DataSet(
       graph.links.map(l => ({
+        id: `${l.source}-${l.target}`,
         from: l.source,
         to: l.target,
         value: l.weight,
@@ -81,7 +85,7 @@ export default function MindMap({ graph, onNodeClick, searchTerm }) {
         width: 1.5,
         selectionWidth: 2,
         hoverWidth: 2,
-        arrows: { to: { enabled: true, scaleFactor: 1.0, type: 'triangle', color: '#97C2FC' } }
+        arrows: { to: { enabled: true, scaleFactor: 1.0, type: 'triangle'} }
       },
       interaction: {
         hover: true,
@@ -96,6 +100,23 @@ export default function MindMap({ graph, onNodeClick, searchTerm }) {
     // Instantiate
     const network = new Network(containerRef.current, { nodes, edges }, options)
     networkRef.current = network
+    network.on('click', params => {
+      if (params.nodes.length === 1) {
+        const nodeId = params.nodes[0]
+        const node = nodes.get(nodeId)
+        if (node) {
+          setEditingNodeId(nodeId)
+          setNewLabel(node.label)
+        }
+      } else if (params.edges.length === 1) {
+        const edgeId = params.edges[0]
+        const edge = edges.get(edgeId)
+        if (edge) {
+          setEditingEdgeId(edgeId)
+          setNewLabel(edge.label)
+        }
+      }
+    })
 
     // Double‑click opens NodeModal
     network.on('doubleClick', params => {
@@ -123,7 +144,7 @@ export default function MindMap({ graph, onNodeClick, searchTerm }) {
     })
 
     return () => network.destroy()
-  }, [graph, onNodeClick])
+  }, [graph, onNodeClick, setGraph])
 
   // 2️⃣ Subgraph filtering whenever searchTerm changes
   useEffect(() => {
@@ -167,10 +188,74 @@ export default function MindMap({ graph, onNodeClick, searchTerm }) {
     net.fit({ animation: { duration: 200, easingFunction: 'easeInOutQuad' } })
   }, [searchTerm])
 
+  const handleRename = () => {
+    const full = originalDataRef.current
+    if (editingNodeId !== null) {
+      full.nodes.update({ id: editingNodeId, label: newLabel })
+      networkRef.current.setData({ nodes: full.nodes, edges: full.edges })
+  
+      // Update graph in localStorage + Supabase
+      const updated = {
+        ...graph,
+        nodes: graph.nodes.map(n =>
+          n.id === editingNodeId ? { ...n, label: newLabel } : n
+        )
+      }
+      setGraph(updated)
+      localStorage.setItem('latestGraph', JSON.stringify(updated))
+  
+      const gallery = JSON.parse(localStorage.getItem('galleryMaps') || '[]')
+      const updatedGallery = gallery.map(m =>
+        m.id === updated.id ? { ...m, graph: updated } : m
+      )
+      localStorage.setItem('galleryMaps', JSON.stringify(updatedGallery))
+  
+      fetch('http://127.0.0.1:8000/store-graph', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+       body: JSON.stringify({ transcript: graph.transcript, graph: updated })
+      }).catch(console.error)
+  
+      setEditingNodeId(null)
+    } else if (editingEdgeId !== null) {
+      full.edges.update({ id: editingEdgeId, label: newLabel })
+      networkRef.current.setData({ nodes: full.nodes, edges: full.edges })
+  
+      const updated = {
+        ...graph,
+        links: graph.links.map(e =>
+          `${e.source}-${e.target}` === editingEdgeId ? { ...e, relation: newLabel } : e
+        )
+      }
+      setGraph(updated)
+      localStorage.setItem('latestGraph', JSON.stringify(updated))
+      const gallery = JSON.parse(localStorage.getItem('galleryMaps') || '[]')
+      const updatedGallery = gallery.map(m =>
+        m.id === updated.id ? { ...m, graph: updated } : m
+      )
+      localStorage.setItem('galleryMaps', JSON.stringify(updatedGallery))
+  
+      // Only call store-graph if you actually have a transcript
+      if (graph.transcript) {
+        fetch('/store-graph', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transcript: graph.transcript,
+            graph: updated
+          })
+        }).catch(console.error)
+      }
+  
+      setEditingEdgeId(null)
+    }
+  }  
+
   return (
     <div
       ref={containerRef}
       className="w-full h-[800px] bg-white rounded-md border shadow"
-    />
+    >
+    </div>
   )
 }
