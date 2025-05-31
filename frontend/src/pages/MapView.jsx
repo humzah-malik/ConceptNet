@@ -1,80 +1,118 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import MindMap from '../MindMap';
-import TopBar from '../components/TopBar';
-import Sidebar from '../components/Sidebar';
+import { AnimatePresence } from 'framer-motion'
+import MindMap from '../components/MindMap';
+import { HiArrowLeft, HiHome, HiDownload, HiTrash } from 'react-icons/hi';
+import jsPDF from 'jspdf';
+import NodeModal from '../components/NodeModal';
 
 export default function MapView() {
-  const { mapId } = useParams(); // Grab map ID from route
+  const { id } = useParams();
   const navigate = useNavigate();
   const [graph, setGraph] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeNode, setActiveNode] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (mapId) {
-      const allMaps = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
-      const match = allMaps.find(m => m.id === mapId);
-      if (match) setGraph(match.graph);
-    } else {
-      const cached = localStorage.getItem('latestGraph');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (parsed?.nodes && parsed?.links) {
-          setGraph(parsed);
-        }
-      }
+    const stored = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
+    const found = stored.find(m => m.id === id);
+    if (found) {
+      setGraph(found.graph);
     }
-  }, [mapId]);
+  }, [id]);
 
-  const handleSave = () => {
-    alert("Coming soon: Export as PDF/PNG/JPG");
+  const handleExport = (format = 'png') => {
+    const originalCanvas = document.querySelector('#vis-graph canvas');
+    if (!originalCanvas) return;
+
+    const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = originalCanvas.width;
+    tempCanvas.height = originalCanvas.height;
+
+    const ctx = tempCanvas.getContext('2d');
+    ctx.fillStyle = '#ffffff'; // enforce white background
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    ctx.drawImage(originalCanvas, 0, 0);
+
+    const dataURL = tempCanvas.toDataURL(mime);
+
+    if (format === 'pdf') {
+      const pdf = new jsPDF();
+      pdf.addImage(dataURL, 'PNG', 10, 10, 180, 135);
+      pdf.save('map.pdf');
+    } else {
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = `map.${format}`;
+      link.click();
+    }
   };
 
   const handleDelete = () => {
-    if (mapId) {
-      // Delete from gallery
-      const allMaps = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
-      const updated = allMaps.filter(m => m.id !== mapId);
-      localStorage.setItem('galleryMaps', JSON.stringify(updated));
-      alert('Map deleted from gallery');
-      navigate('/gallery');
-    } else {
-      // Delete from latestGraph
-      localStorage.removeItem('latestGraph');
-      alert('Latest map deleted');
-      setGraph(null);
-    }
+    const stored = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
+    const updated = stored.filter(m => m.id !== id);
+    localStorage.setItem('galleryMaps', JSON.stringify(updated));
+    navigate('/maps');
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden">
-      <TopBar shift={sidebarOpen} onMenuClick={() => setSidebarOpen(o => !o)} />
+    <div className="relative w-full h-screen bg-white overflow-hidden">
+      {/* Floating Header Buttons */}
+      <div className="absolute top-4 left-4 flex space-x-2 z-50">
+        <button onClick={() => navigate(-1)} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+          <HiArrowLeft className="w-5 h-5 text-gray-700" />
+        </button>
+        <button onClick={() => navigate('/')} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+          <HiHome className="w-5 h-5 text-gray-700" />
+        </button>
+      </div>
 
-      <div className="flex h-full pt-14">
-        <Sidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          onSave={handleSave}
-          onDelete={handleDelete}
+      {/* Center Title */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40">
+        <h1 className="text-lg font-semibold text-gray-800">MindMapper</h1>
+      </div>
+
+      {/* Right Side Buttons */}
+      <div className="absolute top-4 right-4 flex space-x-2 z-50">
+        <button onClick={() => handleExport('png')} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+          <HiDownload className="w-5 h-5 text-gray-700" />
+        </button>
+        <button onClick={handleDelete} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+          <HiTrash className="w-5 h-5 text-red-600" />
+        </button>
+      </div>
+
+      {/* Left-side Search Bar */}
+      <div className="absolute top-20 left-4 z-50 w-64">
+        <input
+          type="text"
+          placeholder="Search node title..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
         />
+      </div>
 
-        <div
-          className={`
-            flex-1 
-            transition-transform duration-300 ease-in-out
-            ${sidebarOpen ? 'translate-x-64' : 'translate-x-0'}
-          `}
-        >
-          <div className="w-full h-full">
-            {graph ? (
-              <MindMap graph={graph} />
-            ) : (
-              <p className="text-center text-gray-600 pt-10">
-                No graph found. Please create one first.
-              </p>
-            )}
-          </div>
-        </div>
+      {/* Graph */}
+      <div id="vis-graph" className="w-full h-full">
+        {graph ? (
+          <MindMap graph={graph} onNodeClick={setActiveNode} searchTerm={searchTerm} />
+        ) : (
+          <p className="text-center pt-20 text-gray-500">Map not found</p>
+        )}
+
+        <AnimatePresence>
+          {activeNode && (
+            <NodeModal
+              key={activeNode.id}
+              node={activeNode}
+              onClose={() => setActiveNode(null)}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

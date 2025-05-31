@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
+import OffscreenRenderer from '../components/OffscreenRenderer';
 import { useNavigate } from 'react-router-dom';
 import {
   HiHome, HiArrowLeft, HiTrash, HiEye, HiPencil, HiDotsVertical,
   HiDownload
 } from 'react-icons/hi';
-import html2canvas from 'html2canvas';
+// import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 export default function Gallery() {
@@ -17,6 +18,8 @@ export default function Gallery() {
   const [exportHoveredId, setExportHoveredId] = useState(null);
   const navigate = useNavigate();
   const menuRefs = useRef({});
+  const [renderingExport, setRenderingExport] = useState(null);
+  const [renderFormat, setRenderFormat] = useState(null);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem('galleryMaps') || '[]');
@@ -70,45 +73,17 @@ export default function Gallery() {
   };
 
   const handleExport = async (graph, format = 'png') => {
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    document.body.appendChild(container);
+    setRenderingExport(graph);
+    setRenderFormat(format);
 
-    const canvas = document.createElement('canvas');
-    canvas.width = 800;
-    canvas.height = 600;
-    container.appendChild(canvas);
-
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = "#f0f0f0";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#000";
-    ctx.font = "20px Arial";
-    ctx.fillText("Graph preview placeholder", 50, 50);
-
-    const image = await html2canvas(container);
-    const dataURL = image.toDataURL('image/png');
-
-    if (format === 'pdf') {
-      const pdf = new jsPDF();
-      pdf.addImage(dataURL, 'PNG', 10, 10, 190, 160);
-      pdf.save('map.pdf');
-    } else {
-      const link = document.createElement('a');
-      link.href = dataURL;
-      link.download = `map.${format}`;
-      link.click();
-    }
-
-    document.body.removeChild(container);
-  };
+    return;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* TopBar */}
       <div className="flex items-center px-4 py-3 bg-white shadow">
-        <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded">
+        <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded">
           <HiArrowLeft className="w-6 h-6 text-gray-700" />
         </button>
         <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded">
@@ -236,6 +211,29 @@ export default function Gallery() {
           </div>
         )}
       </div>
+      {renderingExport && (
+  <OffscreenRenderer
+    graph={renderingExport}
+    onReady={(canvas) => {
+      const mime = renderFormat === 'jpg' ? 'image/jpeg' : 'image/png';
+      const dataURL = canvas.toDataURL(mime);
+
+      if (renderFormat === 'pdf') {
+        const pdf = new jsPDF();
+        pdf.addImage(dataURL, 'PNG', 10, 10, 180, 135);
+        pdf.save('graph.pdf');
+      } else {
+        const link = document.createElement('a');
+        link.href = dataURL;
+        link.download = `graph.${renderFormat}`;
+        link.click();
+      }
+
+      setRenderingExport(null);
+      setRenderFormat(null);
+    }}
+  />
+)}
     </div>
   );
 }
