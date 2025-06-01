@@ -14,6 +14,8 @@ import asyncio
 import fitz # PyMuPDF
 from docx import Document
 from langdetect import detect
+import tiktoken
+
 
 load_dotenv()
 
@@ -24,6 +26,18 @@ print(f"Supabase URL: {supabase_url}")
 print(f"Supabase Key: {supabase_key}")
 
 supabase: Client = create_client(supabase_url, supabase_key)
+
+def truncate_text_to_token_limit(text: str, max_tokens: int = 100000) -> str:
+    try:
+        enc = tiktoken.encoding_for_model("gpt-4o")
+        tokens = enc.encode(text)
+        if len(tokens) > max_tokens:
+            tokens = tokens[:max_tokens]
+        return enc.decode(tokens)
+    except Exception as e:
+        print(f"Truncation fallback: {e}")
+        # crude fallback: truncate by characters
+        return text[:40000]
 
 async def translate_to_english(text: str) -> str:
     try:
@@ -298,10 +312,11 @@ async def store_graph(req: GraphRequest):
         else:
             # Default path: generate from scratch
             print("1. Starting parallel graph generation...")
-            graph_data = await generate_graph_structure(openai_client, req.transcript)
+            safe_transcript = truncate_text_to_token_limit(req.transcript)
+            graph_data = await generate_graph_structure(openai_client, safe_transcript)
 
-            summary_task = generate_node_summaries(openai_client, req.transcript, graph_data["nodes"])
-            quiz_task = generate_quizzes(openai_client, req.transcript, graph_data["nodes"])
+            summary_task = generate_node_summaries(openai_client, safe_transcript, graph_data["nodes"])
+            quiz_task = generate_quizzes(openai_client, safe_transcript, graph_data["nodes"])
 
             summaries_data, quizzes_data = await asyncio.gather(summary_task, quiz_task)
 
