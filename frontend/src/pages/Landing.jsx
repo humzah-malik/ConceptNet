@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 export default function Landing() {
   return (
     <div className="flex flex-col items-center justify-center h-screen text-center space-y-6 bg-white">
-      <h1 className="text-5xl font-extrabold">MindMapper</h1>
+      <h1 className="text-5xl font-extrabold">MindMapper bruhhhh</h1>
       <p className="text-gray-600 text-lg max-w-xl">
         Turn any transcript or PDF into a smart concept map with summaries and quizzes.
       </p>
