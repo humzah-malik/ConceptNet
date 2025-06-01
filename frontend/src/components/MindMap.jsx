@@ -31,6 +31,9 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
         id: n.id,
         label: n.label,
         value: n.weight,
+        ...(n.fixed
+          ? { fixed: { x: true, y: true }, x: n.x, y: n.y }
+          : { fixed: false })
       }))
     )
     const edges = new DataSet(
@@ -103,19 +106,59 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
     network.on('click', params => {
       if (params.nodes.length === 1) {
         const nodeId = params.nodes[0]
-        const node = nodes.get(nodeId)
-        if (node) {
-          setEditingNodeId(nodeId)
-          setNewLabel(node.label)
-        }
-      } else if (params.edges.length === 1) {
+        const jsEvent = params.event.srcEvent
+        if (jsEvent.ctrlKey) {
+          // CTRL+click: toggle lock/freeze for this node
+          // 1) find current position
+          const pos = network.getPosition(nodeId)
+          // 2) see if it's already locked in our DataSet
+          const current = nodes.get(nodeId)
+          const wasLocked = current.fixed && current.fixed.x && current.fixed.y
+          if (wasLocked) {
+            // unlock: allow physics again
+            nodes.update({ id: nodeId, fixed: false })
+            // remove x/y flags from our graph.nodes
+            const newGraph = {
+              ...graph,
+              nodes: graph.nodes.map(n =>
+                n.id === nodeId
+                  ? { id: n.id, label: n.label, weight: n.weight /* drop x/y/fixed */ }
+                  : n
+              )
+            }
+            setGraph(newGraph)
+            localStorage.setItem('galleryMaps', JSON.stringify(
+              JSON.parse(localStorage.getItem('galleryMaps') || '[]').map(m =>
+                m.id === graph.id ? { ...m, graph: newGraph } : m
+              )
+            ))
+          } else {
+            // lock: fix in place at (pos.x, pos.y)
+            nodes.update({ id: nodeId, fixed: { x: true, y: true }, x: pos.x, y: pos.y })
+            // record x,y,fixed=true in our own graph object
+            const newGraph = {
+              ...graph,
+              nodes: graph.nodes.map(n =>
+                n.id === nodeId
+                  ? { ...n, fixed: true, x: pos.x, y: pos.y }
+                  : n
+              )
+            }
+            setGraph(newGraph)
+            localStorage.setItem('galleryMaps', JSON.stringify(
+              JSON.parse(localStorage.getItem('galleryMaps') || '[]').map(m =>
+                m.id === graph.id ? { ...m, graph: newGraph } : m
+              )
+            ))
+          }
+        } else if (params.edges.length === 1) {
         const edgeId = params.edges[0]
         const edge = edges.get(edgeId)
         if (edge) {
           setEditingEdgeId(edgeId)
           setNewLabel(edge.label)
         }
-      }
+      }}
     })
 
     // Double‑click opens NodeModal

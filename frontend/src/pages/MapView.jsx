@@ -78,14 +78,33 @@ export default function MapView() {
       </div>
 
       {/* Right Side Buttons */}
-      <div className="absolute top-4 right-4 flex space-x-2 z-50">
-        <button onClick={() => handleExport('png')} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-          <HiDownload className="w-5 h-5 text-gray-700" />
-        </button>
-        <button onClick={handleDelete} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
-          <HiTrash className="w-5 h-5 text-red-600" />
-        </button>
-      </div>
+    <div className="absolute top-4 right-4 flex space-x-2 z-50">
+      <button
+        onClick={() => handleExport('png')}
+        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+      >
+        <HiDownload className="w-5 h-5 text-gray-700" />
+      </button>
+      <button
+        onClick={handleDelete}
+        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+      >
+        <HiTrash className="w-5 h-5 text-red-600" />
+      </button>
+      <button
+        onClick={() => {
+          const shareURL = `${window.location.origin}/share/${id}`
+          navigator.clipboard.writeText(shareURL)
+            .then(() => alert('Shareable link copied to clipboard!'))
+            .catch(() => alert('Failed to copy link.'))
+        }}
+        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+        title="Copy shareable link"
+      >
+        {/* You can pick any icon—for simplicity, reuse HiDownload but ideally use a link icon */}
+        <span className="w-5 h-5 text-gray-700">🔗</span>
+      </button>
+    </div>
 
       {/* Left-side Search Bar */}
       <div className="absolute top-20 left-4 z-50 w-64">

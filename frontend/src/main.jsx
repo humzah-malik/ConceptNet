@@ -6,6 +6,7 @@ import Landing from './pages/Landing.jsx';
 import NewMap from './pages/NewMap.jsx';
 import Gallery from './pages/Gallery.jsx';
 import MapView from './pages/MapView.jsx';
+import ShareView from './pages/ShareView.jsx';
 
 import './index.css';
 
@@ -17,7 +18,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/newmap" element={<NewMap />} />
         <Route path="/maps" element={<Gallery />} />
         <Route path="/map/:id" element={<MapView />} />
-      </Routes>
+        <Route path="/share/:id" element={<ShareView />} />
+      </Routes> 
     </BrowserRouter>
   </React.StrictMode>
 );
