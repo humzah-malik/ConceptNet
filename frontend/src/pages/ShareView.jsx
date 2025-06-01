@@ -14,10 +14,27 @@ export default function ShareView() {
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('galleryMaps') || '[]')
-    const found = stored.find(m => m.id === id)
-    if (found) setGraph(found.graph)
-  }, [id])
+    const stored = JSON.parse(localStorage.getItem("galleryMaps") || "[]");
+    const foundLocally = stored.find((m) => m.id === id);
+    if (foundLocally) {
+      setGraph(foundLocally.graph);
+      return;
+    }
+
+    fetch(`${BASE_URL}/get-cached-graph/${id}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Map not found on server");
+        }
+        return res.json();
+      })
+      .then((json) => {
+        setGraph(json);
+      })
+      .catch((err) => {
+        console.warn("Could not fetch shared graph:", err);
+      });
+  }, [id]);
 
   return (
     <div className="relative w-full h-screen bg-white overflow-hidden">
