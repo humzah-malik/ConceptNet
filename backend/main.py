@@ -206,6 +206,20 @@ Nodes to create quizzes for:
 
 app = FastAPI()
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",                 
+        "https://mindmapper-1.vercel.app",      
+        "https://mindmapper-crll.onrender.com",  
+        "https://xn--mindmapperpvw8-f72h.onrender.com",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def read_root():
     return {"message": "MindMapper backend is operational!"}
@@ -326,11 +340,3 @@ def get_cached_graph(hash: str):
             raise HTTPException(status_code=404, detail="Graph not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching cached graph: {e}")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://mindmapper-1.vercel.app", "http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
