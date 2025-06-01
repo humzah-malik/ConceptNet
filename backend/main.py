@@ -224,10 +224,11 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",                 
+        "http://localhost:5174",                 
         "https://mindmapper-1.vercel.app",      
         "https://mindmapper-crll.onrender.com",  
         "https://xn--mindmapperpvw8-f72h.onrender.com",
+        
     ],
     allow_credentials=True,
     allow_methods=["*"],
