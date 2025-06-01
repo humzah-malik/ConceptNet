@@ -13,6 +13,7 @@ import hashlib
 import asyncio
 import fitz # PyMuPDF
 from docx import Document
+from langdetect import detect
 
 load_dotenv()
 
@@ -23,6 +24,21 @@ print(f"Supabase URL: {supabase_url}")
 print(f"Supabase Key: {supabase_key}")
 
 supabase: Client = create_client(supabase_url, supabase_key)
+
+async def translate_to_english(text: str) -> str:
+    try:
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a translation assistant. Translate any input into fluent, accurate English."},
+                {"role": "user", "content": text}
+            ],
+            temperature=0.3,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Translation error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Translation failed.")
 
 openai_api_key = os.getenv("OPENAI_API_KEY", "")
 cohere_api_key = os.getenv("COHERE_API_KEY", "")
@@ -209,6 +225,10 @@ async def upload_pdf(file: UploadFile = File(...)):
 
         if not text.strip():
             raise HTTPException(status_code=400, detail="No extractable text found in PDF.")
+        
+        # translate the text to english if it's not in english
+        if detect(text) != "en":
+            text = await translate_to_english(text)
 
         return {"transcript": text}
     
@@ -231,6 +251,10 @@ async def upload_docx(file: UploadFile = File(...)):
 
         if not text.strip():
             raise HTTPException(status_code=400, detail="No extractable text found in DOCX.")
+        
+        # translate the text to english if it's not in english
+        if detect(text) != "en":
+            text = await translate_to_english(text)
 
         return {"transcript": text}
 
