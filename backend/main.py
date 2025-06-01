@@ -303,6 +303,9 @@ async def store_graph(req: GraphRequest):
         transcript = req.transcript or (req.graph or {}).get("transcript")
         if not transcript:
             raise HTTPException(status_code=422, detail="transcript is required")
+        
+        if detect(transcript) != "en":
+            transcript = await translate_to_english(transcript)
 
         hash_id = get_hash(transcript)
 
