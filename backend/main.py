@@ -206,6 +206,10 @@ Nodes to create quizzes for:
 
 app = FastAPI()
 
+@app.get("/")
+def read_root():
+    return {"message": "MindMapper backend is operational!"}
+
 def get_hash(transcript: str) -> str:
     return hashlib.sha256(transcript.encode()).hexdigest()
 
