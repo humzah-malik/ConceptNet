@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { HiHome, HiArrowLeft } from 'react-icons/hi'
-
+import { BASE_URL } from '../api'
 import TextInputCard from '../components/TextInputCard'
 import FileInputCard from '../components/FileInputCard'
 import LoadingModal from '../components/LoadingModal'
@@ -38,7 +38,7 @@ export default function NewMap() {
         : null
 
       if (endpoint) {
-        const res = await fetch(`http://127.0.0.1:8000/${endpoint}`, {
+        const res = await fetch(`${BASE_URL}/${endpoint}`, {
           method: 'POST',
           body: formData
         })
@@ -72,7 +72,7 @@ export default function NewMap() {
       graph = JSON.parse(cached)
     } else {
       try {
-        const supaRes = await fetch(`http://127.0.0.1:8000/get-cached-graph/${hash}`)
+        const supaRes = await fetch(`${BASE_URL}/get-cached-graph/${hash}`)
         if (supaRes.ok) {
           graph = await supaRes.json()
         }
@@ -86,7 +86,7 @@ export default function NewMap() {
     await sleep(800)
 
     if (!graph) {
-      const genRes = await fetch('http://127.0.0.1:8000/store-graph', {
+      const genRes = await fetch(`${BASE_URL}/store-graph`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcript })

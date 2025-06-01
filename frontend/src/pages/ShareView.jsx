@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import MindMap from '../components/MindMap'
 import NodeModal from '../components/NodeModal'
 import { HiArrowLeft, HiHome } from 'react-icons/hi'
+import { BASE_URL } from '../api'
 
 export default function ShareView() {
   const { id } = useParams()

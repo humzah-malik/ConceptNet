@@ -8,6 +8,7 @@ import {
   HiDownload
 } from 'react-icons/hi';
 import jsPDF from 'jspdf';
+import { BASE_URL } from '../api';
 
 export default function Gallery() {
   const [maps, setMaps] = useState([]);

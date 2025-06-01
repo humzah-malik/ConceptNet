@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { DataSet, Network } from 'vis-network/standalone'
+import { BASE_URL } from '../api';
 
 // just below your imports:
 const normalize = s =>
@@ -253,7 +254,7 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
       )
       localStorage.setItem('galleryMaps', JSON.stringify(updatedGallery))
   
-      fetch('http://127.0.0.1:8000/store-graph', {
+      fetch(`${BASE_URL}/store-graph`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
        body: JSON.stringify({ transcript: graph.transcript, graph: updated })
@@ -280,7 +281,7 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
   
       // Only call store-graph if you actually have a transcript
       if (graph.transcript) {
-        fetch('/store-graph', {
+        fetch(`${BASE_URL}/store-graph`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
