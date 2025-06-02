@@ -6,6 +6,7 @@ import { BASE_URL } from '../api'
 import TextInputCard from '../components/TextInputCard'
 import FileInputCard from '../components/FileInputCard'
 import LoadingModal from '../components/LoadingModal'
+import Layout from '../components/Layout'
 
 function sleep(ms) {
   return new Promise(res => setTimeout(res, ms))
@@ -123,9 +124,10 @@ export default function NewMap() {
   }
 
   return (
-    <div className="relative min-h-screen bg-gray-50">
+    <Layout>
+    <div className="relative min-h-screen">
       {/* Mini header with back button */}
-      <div className="flex items-center px-4 py-3 bg-white shadow">
+      <div className="flex items-center px-4 py-4 bg-transparent shadow-none backdrop-blur-md">
       <button
           onClick={() => navigate(-1)}
           className="p-2 hover:bg-gray-100 rounded"
@@ -145,7 +147,7 @@ export default function NewMap() {
       </div>
 
       {/* Input Section: Centered Vertically */}
-      <div className="flex flex-col items-center justify-center px-4 py-16 min-h-[calc(100vh-64px)]">
+      <div className="flex flex-col items-center justify-center px-4 py-12 min-h-[calc(100vh-64px)]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
           <TextInputCard text={text} onChange={setText} />
           <FileInputCard
@@ -159,9 +161,9 @@ export default function NewMap() {
         <button
           onClick={handleCreateMap}
           disabled={showModal}
-          className="mt-8 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full shadow-lg flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+          className="mt-8 btn btn-indigo rounded-full shadow-lg flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
         >
-          <span className="font-medium">Create Map</span>
+          <span>Create Map</span>
         </button>
       </div>
 
@@ -173,5 +175,6 @@ export default function NewMap() {
       {/* In‑modal Stepper and spinner/check */}
       <LoadingModal show={showModal} currentStep={currentStep} />
     </div>
+    </Layout>
   )
 }

@@ -1,3 +1,13 @@
+const theme = localStorage.getItem('theme');
+if (
+  theme === 'dark' ||
+  (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+) {
+  document.documentElement.classList.add('dark');
+} else {
+  document.documentElement.classList.remove('dark');
+}
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -9,8 +19,6 @@ import ShareView from './pages/ShareView.jsx';
 import './index.css';
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import { Analytics } from '@vercel/analytics/react';
-
-
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

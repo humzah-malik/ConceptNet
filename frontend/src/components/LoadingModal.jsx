@@ -7,7 +7,7 @@ export default function LoadingModal({ show, currentStep }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-80 p-6">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-xl w-80 p-6 transition-all">
       <Stepper step={currentStep} />
 
         {currentStep < 4 && (

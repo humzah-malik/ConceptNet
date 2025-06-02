@@ -9,6 +9,7 @@ import {
 } from 'react-icons/hi';
 import jsPDF from 'jspdf';
 import { BASE_URL } from '../api';
+import Layout from '../components/Layout';
 
 export default function Gallery() {
   const [maps, setMaps] = useState([]);
@@ -88,7 +89,7 @@ export default function Gallery() {
     };
   }, [selectedId]);
 
-  // 4️⃣ Update maps + re-filter when gallery changes
+  // 4️Update maps + re-filter when gallery changes
   const updateGallery = (updatedMaps) => {
     setMaps(updatedMaps);
     localStorage.setItem('galleryMaps', JSON.stringify(updatedMaps));
@@ -130,9 +131,10 @@ export default function Gallery() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
+    <div className="min-h-screen">
       {/* ─── TopBar ───────────────────────────────────────────────────────── */}
-      <div className="flex items-center px-4 py-3 bg-white shadow">
+      <div className="flex items-center px-4 py-3 bg-transparent shadow-none backdrop-blur-md">
         <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded">
           <HiArrowLeft className="w-6 h-6 text-gray-700" />
         </button>
@@ -203,12 +205,12 @@ export default function Gallery() {
                 onClick={() => setSelectedId(map.id)}
                 onDoubleClick={() => navigate(`/map/${map.id}`)}
                 className={`
-                  bg-white p-4 rounded 
-                  flex flex-col justify-between relative
-                  transition-shadow duration-150
-                  ${selectedId === map.id ? 'shadow-xl border-2 border-indigo-500' : 'shadow-md'}
-                  hover:shadow-xl hover:cursor-pointer
-                `}
+                    bg-white rounded-xl border border-gray-100 shadow-md
+                    transition-transform duration-200 ease-in-out
+                    hover:shadow-lg hover:scale-[1.01]
+                    p-5 flex flex-col justify-between relative z-0 overflow-visible
+                    ${selectedId === map.id ? 'ring-2 ring-indigo-400/70' : ''}
+                  `}                  
               >
                 <div className="flex justify-between items-center mb-1">
                   <h3
@@ -258,7 +260,7 @@ export default function Gallery() {
                 {openMenuId === map.id && (
                   <div
                     ref={el => (menuRefs.current[map.id] = el)}
-                    className="absolute top-0 left-full ml-2 bg-white border shadow-md rounded-md z-10 w-40 text-sm"
+                    className="absolute top-10 right-5 bg-white border border-gray-200 shadow-lg rounded-md z-[998] w-40 text-sm"
                   >
 
 
@@ -308,7 +310,9 @@ export default function Gallery() {
                         <HiDownload className="inline mr-2" /> Export
                       </button>
                       {exportHoveredId === map.id && (
-                        <div className="absolute top-0 left-full ml-1 bg-white border rounded shadow text-sm">
+                        <div className="absolute top-0 left-full ml-1 
+                        bg-white border border-gray-200 shadow-xl 
+                        rounded-md text-sm w-28 z-[1001]">                   
                           <button
                             onClick={() => handleExport(map.graph, 'png')}
                             className="block px-3 py-1 hover:bg-gray-100"
@@ -371,5 +375,6 @@ export default function Gallery() {
         />
       )}
     </div>
+    </Layout>
   );
 }

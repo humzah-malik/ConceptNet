@@ -61,7 +61,7 @@ export default function MapView() {
   };
 
   return (
-    <div className="relative w-full h-screen bg-white overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden">
       {/* Floating Header Buttons */}
       <div className="absolute top-4 left-4 flex space-x-2 z-50">
         <button onClick={() => navigate(-1)} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
