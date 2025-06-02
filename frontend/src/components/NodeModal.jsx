@@ -155,7 +155,7 @@ export default function NodeModal({ node, onClose, graphId }) {
                 &larr; Back to Summary
               </button>
               <span className="text-sm text-gray-600">
-                Question {currentQ + 1} of {quiz.length}
+                {/*Question {currentQ + 1} of {quiz.length}*/}
               </span>
             </div>
 

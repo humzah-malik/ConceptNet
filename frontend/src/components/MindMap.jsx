@@ -98,6 +98,17 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
         navigationButtons: false,
         keyboard: true,
         zoomView: true
+      },
+      configure: {enabled: false
+      },
+      autoResize: true,
+      height: '100%',
+      width: '100%',
+      locale: 'en',
+      locales: 'en',
+      manipulation: false,
+      background: {
+        color: '#9dafd4' // Or a soft tone like the lightest gradient color
       }
     }
 
@@ -298,7 +309,7 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
   return (
     <div
       ref={containerRef}
-      className="w-full h-[800px] bg-white rounded-md border shadow"
+      className="w-full h-[800px] bg-transparent rounded-md shadow"
     >
     </div>
   )

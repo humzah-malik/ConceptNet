@@ -64,10 +64,10 @@ export default function MapView() {
     <div className="relative w-full h-screen overflow-hidden">
       {/* Floating Header Buttons */}
       <div className="absolute top-4 left-4 flex space-x-2 z-50">
-        <button onClick={() => navigate(-1)} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+        <button onClick={() => navigate(-1)} className="p-2 bg-white rounded shadow hover:bg-gray-100">
           <HiArrowLeft className="w-5 h-5 text-gray-700" />
         </button>
-        <button onClick={() => navigate('/')} className="p-2 bg-white rounded-full shadow hover:bg-gray-100">
+        <button onClick={() => navigate('/')} className="p-2 bg-white rounded shadow hover:bg-gray-100">
           <HiHome className="w-5 h-5 text-gray-700" />
         </button>
       </div>
@@ -81,13 +81,13 @@ export default function MapView() {
     <div className="absolute top-4 right-4 flex space-x-2 z-50">
       <button
         onClick={() => handleExport('png')}
-        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+        className="p-2 bg-white rounded shadow hover:bg-gray-100"
       >
         <HiDownload className="w-5 h-5 text-gray-700" />
       </button>
       <button
         onClick={handleDelete}
-        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+        className="p-2 bg-white rounded shadow hover:bg-gray-100"
       >
         <HiTrash className="w-5 h-5 text-red-600" />
       </button>
@@ -98,7 +98,7 @@ export default function MapView() {
             .then(() => alert('Shareable link copied to clipboard!'))
             .catch(() => alert('Failed to copy link.'))
         }}
-        className="p-2 bg-white rounded-full shadow hover:bg-gray-100"
+        className="p-2 bg-white rounded shadow hover:bg-gray-100"
         title="Copy shareable link"
       >
         {/* You can pick any icon—for simplicity, reuse HiDownload but ideally use a link icon */}
@@ -118,7 +118,7 @@ export default function MapView() {
       </div>
 
       {/* Quiz Analytics Panel */}
-      <div className="absolute top-44 left-4 w-64 z-50 bg-white border rounded-md shadow-md p-4">
+      <div className="absolute top-44 left-4 w-64 z-50 bg-white rounded-md shadow-md p-4">
         <h2 className="text-md font-semibold mb-3 text-center text-gray-800">Quiz Analytics</h2>
 
         {graph && (() => {
