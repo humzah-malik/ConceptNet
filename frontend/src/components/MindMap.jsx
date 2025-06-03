@@ -371,7 +371,7 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
       <ThemeToggle />
       <div
   ref={containerRef}
-  className="w-full h-full shadow bg-gray-100 dark:bg-slate-800 transition-colors duration-500"
+  className="w-full h-[800px] shadow bg-gray-100 dark:bg-slate-800 transition-colors duration-500"
 />
     </div>
   )
