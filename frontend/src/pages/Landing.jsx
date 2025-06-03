@@ -8,8 +8,8 @@ export default function Landing() {
     <Layout>
       <ParticlesBackground />
       <div className="flex flex-col items-center justify-center h-screen text-center space-y-6">
-        <h1 className="text-5xl font-extrabold text-gray-800 dark:text-black">MindMapper</h1>
-        <p className="text-gray-600 dark:text-black text-lg max-w-xl">
+        <h1 className="text-5xl font-extrabold text-black dark:text-white">MindMapper</h1>
+        <p className="text-black dark:text-white text-lg max-w-xl">
           Turn any transcript or PDF into a smart concept map with summaries and quizzes.
         </p>
         <div className="space-x-4">

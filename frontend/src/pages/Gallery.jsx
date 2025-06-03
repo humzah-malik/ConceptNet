@@ -136,12 +136,12 @@ export default function Gallery() {
       {/* ─── TopBar ───────────────────────────────────────────────────────── */}
       <div className="flex items-center px-4 py-3 bg-transparent shadow-none backdrop-blur-md">
         <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded">
-          <HiArrowLeft className="w-6 h-6 text-gray-700" />
+          <HiArrowLeft className="w-6 h-6 text-gray-700 dark:text-white" />
         </button>
         <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 rounded">
-          <HiHome className="w-6 h-6 text-gray-700" />
+          <HiHome className="w-6 h-6 text-gray-700 dark:text-white" />
         </button>
-        <h1 className="flex-1 text-center text-xl font-semibold">My Maps</h1>
+        <h1 className="flex-1 text-center text-xl font-semibold text-black dark:text-white">My Maps</h1>
         <div className="w-8" />
       </div>
 

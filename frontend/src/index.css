@@ -1,6 +1,9 @@
-@import "tailwindcss";
 @import "vis-network/styles/vis-network.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* Custom global styles */
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   text-rendering: optimizeLegibility;
@@ -13,75 +16,34 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
-  /* We remove the gradient from here */
-  background-color: white;
   color: #213547;
 }
 
-/* Keep the keyframes around so we can reference them in a <div> instead */
+/* Animations */
 @keyframes gradient-x {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
-
-.button {
-  border-radius: 0.375rem;
-  padding: 0.5rem 1rem;
-  font-weight: 500;
-  color: white;
-  background-color: #f59e0b;
-  transition: background-color 0.2s ease;
-}
-.button:hover {
-  background-color: #1d4ed8;
-}
-
-a {
-  color: #3b82f6;
-  text-decoration: none;
-  font-weight: 500;
-}
-a:hover {
-  color: #2563eb;
-}
-
 @keyframes blob {
-  0%, 100% {
-    transform: scale(1) translate(0, 0);
-  }
-  50% {
-    transform: scale(1.1) translate(20px, -20px);
-  }
+  0%, 100% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.1) translate(20px, -20px); }
 }
 .animate-blob {
   animation: blob 10s infinite ease-in-out;
 }
 
-.glass {
-  @apply bg-white/30 dark:bg-gray-900/30 backdrop-blur-lg rounded-xl shadow-lg;
-}
-
-@keyframes gradient-x {
-  0%, 100% {
-    background-position: 0% 50%;
+/* Tailwind-enhanced component styles */
+@layer components {
+  .glass {
+    @apply bg-white/30 dark:bg-gray-900/30 backdrop-blur-lg rounded-xl shadow-lg;
   }
-  50% {
-    background-position: 100% 50%;
+  .btn {
+    @apply rounded-md font-medium transition px-6 py-3;
   }
-}
-
-.btn {
-  @apply rounded-md font-medium transition px-6 py-3;
-}
-
-.btn-indigo {
-  @apply bg-indigo-600 text-white hover:bg-indigo-700 shadow;
-}
-
-.btn-amber {
-  @apply bg-amber-400 text-white hover:bg-amber-500 shadow;
+  .btn-indigo {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700 shadow;
+  }
+  .btn-amber {
+    @apply bg-amber-400 text-white hover:bg-amber-500 shadow;
+  }
 }

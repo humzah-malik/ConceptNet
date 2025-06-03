@@ -64,32 +64,32 @@ export default function MapView() {
     <div className="relative w-full h-screen overflow-hidden">
       {/* Floating Header Buttons */}
       <div className="absolute top-4 left-4 flex space-x-2 z-50">
-        <button onClick={() => navigate(-1)} className="p-2 bg-white rounded shadow hover:bg-gray-100">
-          <HiArrowLeft className="w-5 h-5 text-gray-700" />
+        <button onClick={() => navigate(-1)} className="p-2 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700">
+          <HiArrowLeft className="w-5 h-5 text-gray-700 dark:text-white" />
         </button>
-        <button onClick={() => navigate('/')} className="p-2 bg-white rounded shadow hover:bg-gray-100">
-          <HiHome className="w-5 h-5 text-gray-700" />
+        <button onClick={() => navigate('/')} className="p-2 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700">
+          <HiHome className="w-5 h-5 text-gray-700 dark:text-white" />
         </button>
       </div>
 
       {/* Center Title */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40">
-        <h1 className="text-lg font-semibold text-gray-800">MindMapper</h1>
+        <h1 className="text-lg font-semibold text-gray-800 dark:text-white">MindMapper</h1>
       </div>
 
       {/* Right Side Buttons */}
     <div className="absolute top-4 right-4 flex space-x-2 z-50">
       <button
         onClick={() => handleExport('png')}
-        className="p-2 bg-white rounded shadow hover:bg-gray-100"
+        className="p-2 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700"
       >
-        <HiDownload className="w-5 h-5 text-gray-700" />
+        <HiDownload className="w-5 h-5 text-gray-700 dark:text-white" />
       </button>
       <button
         onClick={handleDelete}
-        className="p-2 bg-white rounded shadow hover:bg-gray-100"
+        className="p-2 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700"
       >
-        <HiTrash className="w-5 h-5 text-red-600" />
+        <HiTrash className="w-5 h-5 text-red-600 dark:text-white" />
       </button>
       <button
         onClick={() => {
@@ -98,11 +98,11 @@ export default function MapView() {
             .then(() => alert('Shareable link copied to clipboard!'))
             .catch(() => alert('Failed to copy link.'))
         }}
-        className="p-2 bg-white rounded shadow hover:bg-gray-100"
+        className="p-2 rounded shadow hover:bg-gray-200 dark:hover:bg-gray-700"
         title="Copy shareable link"
       >
         {/* You can pick any icon—for simplicity, reuse HiDownload but ideally use a link icon */}
-        <span className="w-5 h-5 text-gray-700">🔗</span>
+        <span className="w-5 h-5 text-gray-700 dark:text-white">🔗</span>
       </button>
     </div>
 

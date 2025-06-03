@@ -1,6 +1,6 @@
 import React from 'react'
 import ThemeToggle from './ThemeToggle'
-import Background from './Background' // we’ll make this next
+import Background from './Background'
 
 export default function Layout({ children }) {
   return (

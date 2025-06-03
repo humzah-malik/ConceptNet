@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { DataSet, Network } from 'vis-network/standalone'
 import { BASE_URL } from '../api';
+import ThemeToggle from './ThemeToggle';
 
 // just below your imports:
 const normalize = s =>
@@ -53,64 +54,90 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
     originalDataRef.current = { nodes, edges }
 
     // Network options
-    const options = {
-      layout: { randomSeed: 2, improvedLayout: true, clusterThreshold: 150 },
-      physics: {
-        enabled: true,
-        barnesHut: {
-          gravitationalConstant: -2000,
-          centralGravity: 0.1,
-          springLength: 200,
-          springConstant: 0.04,
-          damping: 0.09,
-          avoidOverlap: 1.5
-        },
-        repulsion: { nodeDistance: 250 },
-        solver: 'barnesHut',
-        stabilization: { enabled: true, iterations: 1000, updateInterval: 25, onlyDynamicEdges: false, fit: true }
-      },
-      nodes: {
-        shape: 'dot',
-        size: 20,
-        borderWidth: 2,
-        color: {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+
+const options = {
+  layout: { randomSeed: 2, improvedLayout: true, clusterThreshold: 150 },
+  physics: {
+    enabled: true,
+    barnesHut: {
+      gravitationalConstant: -2000,
+      centralGravity: 0.1,
+      springLength: 200,
+      springConstant: 0.04,
+      damping: 0.09,
+      avoidOverlap: 1.5,
+    },
+    repulsion: { nodeDistance: 250 },
+    solver: 'barnesHut',
+    stabilization: {
+      enabled: true,
+      iterations: 1000,
+      updateInterval: 25,
+      onlyDynamicEdges: false,
+      fit: true,
+    },
+  },
+  nodes: {
+    shape: 'dot',
+    size: 20,
+    borderWidth: 2,
+    color: isDarkMode
+      ? {
+          border: '#facc15',
+          background: '#fcd34d',
+          highlight: { border: '#facc15', background: '#fde68a' },
+          hover: { border: '#facc15', background: '#fef3c7' },
+        }
+      : {
           border: '#97C2FC',
           background: '#D2E5FF',
           highlight: { border: '#2B7CE9', background: '#D2E5FF' },
-          hover: { border: '#2B7CE9', background: '#FFF5D2' }
+          hover: { border: '#2B7CE9', background: '#FFF5D2' },
         },
-        font: { color: '#343434', size: 14 },
-        margin: 20,
-        mass: 1.5
-      },  
-      edges: {
-        smooth: { type: 'continuous', forceDirection: 'none', roundness: 0.5 },
-        color: { color: '#97C2FC', highlight: '#7AA3E5', hover: '#FBC02D', opacity: 0.8 },
-        width: 1.5,
-        selectionWidth: 2,
-        hoverWidth: 2,
-        arrows: { to: { enabled: true, scaleFactor: 1.0, type: 'triangle'} }
-      },
-      interaction: {
-        hover: true,
-        tooltipDelay: 0,
-        hideEdgesOnDrag: true,
-        navigationButtons: false,
-        keyboard: true,
-        zoomView: true
-      },
-      configure: {enabled: false
-      },
-      autoResize: true,
-      height: '100%',
-      width: '100%',
-      locale: 'en',
-      locales: 'en',
-      manipulation: false,
-      background: {
-        color: '#9dafd4' // Or a soft tone like the lightest gradient color
-      }
-    }
+    font: {
+      color: isDarkMode ? '#ffffff' : '#343434',  // <—— WHITE in dark, gray in light
+      size: 14,
+    },
+    margin: 20,
+    mass: 1.5,
+  },
+  edges: {
+    smooth: { type: 'continuous', forceDirection: 'none', roundness: 0.5 },
+    color: isDarkMode
+      ? { color: '#facc15', highlight: '#fbbf24', hover: '#fcd34d', opacity: 0.85 }
+      : { color: '#97C2FC', highlight: '#7AA3E5', hover: '#FBC02D', opacity: 0.8 },
+    width: 1.5,
+    selectionWidth: 2,
+    hoverWidth: 2,
+    arrows: {
+      to: { enabled: true, scaleFactor: 1.0, type: 'triangle' },
+    },
+    font: {
+      color: isDarkMode ? '#ffffff' : '#343434', // <—— Match nodes
+      size: 12,
+      face: 'arial',
+      align: 'middle',
+    },  
+  },
+  interaction: {
+    hover: true,
+    tooltipDelay: 0,
+    hideEdgesOnDrag: true,
+    navigationButtons: false,
+    keyboard: true,
+    zoomView: true,
+  },
+  configure: { enabled: false },
+  autoResize: true,
+  height: '100%',
+  width: '100%',
+  locale: 'en',
+  manipulation: false,
+  background: {
+    color: isDarkMode ? '#0f172a' : '#f8fafc', // slate-900 or light
+  },
+};
 
     // Instantiate
     const network = new Network(containerRef.current, { nodes, edges }, options)
@@ -307,14 +334,12 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
   }  
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-[800px] rounded-md shadow"
-      style={{
-        backgroundColor: '#f3f4f6',
-        opacity: 0.9
-      }}
-    >
+    <div>
+      <ThemeToggle />
+      <div
+  ref={containerRef}
+  className="w-full h-[800px] rounded-md shadow bg-gray-100 dark:bg-slate-800 transition-colors duration-500"
+/>
     </div>
   )
 }

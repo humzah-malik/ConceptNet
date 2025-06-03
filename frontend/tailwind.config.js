@@ -1,16 +1,19 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+export default {
   darkMode: 'class',
+  content: [
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx}"
+  ],
   theme: {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#6366F1', // indigo-500
-          dark: '#4F46E5',
+          DEFAULT: '#6366F1',
+          dark:    '#4F46E5',
         },
         accent: {
-          DEFAULT: '#F59E0B', // amber-500
+          DEFAULT: '#F59E0B',
         },
         glass: 'rgba(255, 255, 255, 0.1)',
       },
@@ -23,7 +26,7 @@ module.exports = {
       keyframes: {
         'gradient-x': {
           '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
+          '50%':      { backgroundPosition: '100% 50%' },
         },
       },
     },

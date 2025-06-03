@@ -120,7 +120,7 @@ export default function NewMap() {
     setCurrentStep(4)
     await sleep(600)
     setShowModal(false)
-    navigate(`/map/${mapId}`)  // 👈 change route to load specific map
+    navigate(`/map/${mapId}`)
   }
 
   return (
@@ -132,15 +132,15 @@ export default function NewMap() {
           onClick={() => navigate(-1)}
           className="p-2 hover:bg-gray-100 rounded"
         >
-          <HiArrowLeft className="w-6 h-6 text-gray-700" />
+          <HiArrowLeft className="w-6 h-6 text-gray-700 dark:text-white" />
         </button>
         <button
           onClick={() => navigate('/')}
           className="p-2 hover:bg-gray-100 rounded"
         >
-          <HiHome className="w-6 h-6 text-gray-700" />
+          <HiHome className="w-6 h-6 text-gray-700 dark:text-white" />
         </button>
-        <h1 className="flex-1 text-center text-xl font-semibold">
+        <h1 className="flex-1 text-center text-xl font-semibold text-black dark:text-white">
           Create a New Mind Map
         </h1>
         <div className="w-8" /> {/* placeholder for right spacing */}
@@ -161,7 +161,7 @@ export default function NewMap() {
         <button
           onClick={handleCreateMap}
           disabled={showModal}
-          className="mt-8 btn btn-indigo rounded-full shadow-lg flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="mt-8 btn btn-indigo rounded-full shadow-lg flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-300 dark:bg-amber-500 dark:hover:bg-amber-600 dark:text-white"
         >
           <span>Create Map</span>
         </button>
