@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { DataSet, Network } from 'vis-network/standalone'
 import { BASE_URL } from '../api';
 import ThemeToggle from './ThemeToggle';
+import useIsDarkMode from '../hooks/useIsDarkMode';
 
 // just below your imports:
 const normalize = s =>
@@ -19,7 +20,8 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
   const [editingNodeId, setEditingNodeId] = useState(null)
   const [editingEdgeId, setEditingEdgeId] = useState(null)
   const [newLabel, setNewLabel] = useState('')
-  
+  const isDarkMode = useIsDarkMode();
+
   // 1️⃣ Initial graph construction
   useEffect(() => {
     if (!containerRef.current || !graph?.nodes || !graph?.links) {
@@ -54,90 +56,119 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
     originalDataRef.current = { nodes, edges }
 
     // Network options
-    const isDarkMode = document.documentElement.classList.contains('dark');
-
-const options = {
-  layout: { randomSeed: 2, improvedLayout: true, clusterThreshold: 150 },
-  physics: {
-    enabled: true,
-    barnesHut: {
-      gravitationalConstant: -2000,
-      centralGravity: 0.1,
-      springLength: 200,
-      springConstant: 0.04,
-      damping: 0.09,
-      avoidOverlap: 1.5,
-    },
-    repulsion: { nodeDistance: 250 },
-    solver: 'barnesHut',
-    stabilization: {
-      enabled: true,
-      iterations: 1000,
-      updateInterval: 25,
-      onlyDynamicEdges: false,
-      fit: true,
-    },
-  },
-  nodes: {
-    shape: 'dot',
-    size: 20,
-    borderWidth: 2,
-    color: isDarkMode
-      ? {
-          border: '#facc15',
-          background: '#fcd34d',
-          highlight: { border: '#facc15', background: '#fde68a' },
-          hover: { border: '#facc15', background: '#fef3c7' },
-        }
-      : {
-          border: '#97C2FC',
-          background: '#D2E5FF',
-          highlight: { border: '#2B7CE9', background: '#D2E5FF' },
-          hover: { border: '#2B7CE9', background: '#FFF5D2' },
+    const options = {
+      layout: {
+        randomSeed: 2,
+        improvedLayout: true,
+        clusterThreshold: 150,
+      },
+      physics: {
+        enabled: true,
+        barnesHut: {
+          gravitationalConstant: -2000,
+          centralGravity: 0.1,
+          springLength: 200,
+          springConstant: 0.04,
+          damping: 0.09,
+          avoidOverlap: 1.5,
         },
-    font: {
-      color: isDarkMode ? '#ffffff' : '#343434',  // <—— WHITE in dark, gray in light
-      size: 14,
-    },
-    margin: 20,
-    mass: 1.5,
-  },
-  edges: {
-    smooth: { type: 'continuous', forceDirection: 'none', roundness: 0.5 },
-    color: isDarkMode
-      ? { color: '#facc15', highlight: '#fbbf24', hover: '#fcd34d', opacity: 0.85 }
-      : { color: '#97C2FC', highlight: '#7AA3E5', hover: '#FBC02D', opacity: 0.8 },
-    width: 1.5,
-    selectionWidth: 2,
-    hoverWidth: 2,
-    arrows: {
-      to: { enabled: true, scaleFactor: 1.0, type: 'triangle' },
-    },
-    font: {
-      color: isDarkMode ? '#ffffff' : '#343434', // <—— Match nodes
-      size: 12,
-      face: 'arial',
-      align: 'middle',
-    },  
-  },
-  interaction: {
-    hover: true,
-    tooltipDelay: 0,
-    hideEdgesOnDrag: true,
-    navigationButtons: false,
-    keyboard: true,
-    zoomView: true,
-  },
-  configure: { enabled: false },
-  autoResize: true,
-  height: '100%',
-  width: '100%',
-  locale: 'en',
-  manipulation: false,
-  background: {
-    color: isDarkMode ? '#0f172a' : '#f8fafc', // slate-900 or light
-  },
-};
+        repulsion: { nodeDistance: 250 },
+        solver: 'barnesHut',
+        stabilization: {
+          enabled: true,
+          iterations: 1000,
+          updateInterval: 25,
+          onlyDynamicEdges: false,
+          fit: true,
+        },
+      },
+      nodes: {
+        shape: 'dot',
+        size: 20,
+        borderWidth: 2,
+        color: isDarkMode
+          ? {
+              // Dark mode (teal/cyan palette)
+              border: '#14b8a6',            // teal-500
+              background: '#2dd4bf',        // teal-400
+              highlight: {
+                border: '#14b8a6',          // teal-500
+                background: '#5eead4',      // teal-300
+              },
+              hover: {
+                border: '#14b8a6',          // teal-500
+                background: '#99f6e4',      // teal-200
+              },
+            }
+          : {
+              // Light mode (unchanged from before)
+              border: '#97C2FC',            // light-blue
+              background: '#D2E5FF',
+              highlight: {
+                border: '#2B7CE9',          // blue-600
+                background: '#D2E5FF',
+              },
+              hover: {
+                border: '#2B7CE9',
+                background: '#FFF5D2',
+              },
+            },
+        font: {
+          color: isDarkMode ? '#e2e8f0' : '#343434', // light gray in dark, dark gray in light
+          size: 14,
+        },
+        margin: 20,
+        mass: 1.5,
+      },
+      edges: {
+        smooth: { type: 'continuous', forceDirection: 'none', roundness: 0.5 },
+        color: isDarkMode
+          ? {
+              // Dark mode (matching teal/cyan)
+              color: '#22d3ee',       // cyan-300
+              highlight: '#06b6d4',   // cyan-500
+              hover: '#38bdf8',       // cyan-400
+              opacity: 0.9,
+            }
+          : {
+              // Light mode (unchanged)
+              color: '#97C2FC',
+              highlight: '#7AA3E5',
+              hover: '#FBC02D',
+              opacity: 0.8,
+            },
+        width: 1.5,
+        selectionWidth: 2,
+        hoverWidth: 2,
+        arrows: {
+          to: { enabled: true, scaleFactor: 1.0, type: 'triangle' },
+        },
+        font: {
+          color: isDarkMode ? '#e2e8f0' : '#343434', // same as node text
+          size: 12,
+          face: 'arial',
+          align: 'middle',
+        },
+      },
+      interaction: {
+        hover: true,
+        tooltipDelay: 0,
+        hideEdgesOnDrag: true,
+        navigationButtons: false,
+        keyboard: true,
+        zoomView: true,
+      },
+      configure: { enabled: false },
+      autoResize: true,
+      height: '100%',
+      width: '100%',
+      locale: 'en',
+      manipulation: false,
+      background: {
+        color: isDarkMode ? '#1e293b' : '#f8fafc', // dark: slate-800, light: slate-50
+      },
+    }
+    
 
     // Instantiate
     const network = new Network(containerRef.current, { nodes, edges }, options)
@@ -226,7 +257,7 @@ const options = {
     })
 
     return () => network.destroy()
-  }, [graph, onNodeClick, setGraph])
+  }, [graph, onNodeClick, setGraph, isDarkMode])
 
   // 2️⃣ Subgraph filtering whenever searchTerm changes
   useEffect(() => {
