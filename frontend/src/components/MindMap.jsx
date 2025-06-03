@@ -309,7 +309,11 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
   return (
     <div
       ref={containerRef}
-      className="w-full h-[800px] bg-transparent rounded-md shadow"
+      className="w-full h-[800px] rounded-md shadow"
+      style={{
+        backgroundColor: '#f3f4f6',
+        opacity: 0.9
+      }}
     >
     </div>
   )
