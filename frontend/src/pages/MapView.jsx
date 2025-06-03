@@ -108,18 +108,28 @@ export default function MapView() {
 
       {/* Left-side Search Bar */}
       <div className="absolute top-20 left-4 z-50 w-64">
-        <input
-          type="text"
-          placeholder="Search node title..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-indigo-200"
-        />
+      <input
+  type="text"
+  placeholder="Search topic..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+  className="w-full px-4 py-2 rounded-md shadow-sm
+    border border-gray-300 dark:border-gray-600
+    bg-white dark:bg-[#1a1f23]
+    text-gray-800 dark:text-gray-100
+    placeholder:text-gray-400 dark:placeholder:text-gray-500
+    focus:ring-2 focus:ring-indigo-500 transition-colors backdrop-blur-sm bg-white/80 dark:bg-[#1a1f23]/70"
+/>
       </div>
 
       {/* Quiz Analytics Panel */}
-      <div className="absolute top-44 left-4 w-64 z-50 bg-white rounded-md shadow-md p-4">
-        <h2 className="text-md font-semibold mb-3 text-center text-gray-800">Quiz Analytics</h2>
+      <div className="absolute top-44 left-4 w-64 z-50 
+  bg-white dark:bg-[#1a1f23]
+  border border-gray-300 dark:border-gray-600
+  rounded-xl shadow-md p-4
+  text-gray-800 dark:text-gray-100"
+>
+        <h2 className="text-md font-semibold mb-3 text-center text-gray-800 dark:text-gray-100">Quiz Analytics</h2>
 
         {graph && (() => {
           const nodeStats = quizStats?.[id] || {};
@@ -139,32 +149,32 @@ export default function MapView() {
             <div className="text-sm text-gray-700 space-y-3">
               {/* Total Score */}
               <div>
-                <p className="font-medium">Total Score</p>
+                <p className="font-medium text-gray-800 dark:text-gray-100">Total Score</p>
                 <div className="w-full h-2 bg-gray-200 rounded overflow-hidden mb-1">
                   <div
                     className="h-full bg-indigo-500"
                     style={{ width: totalAttempts > 0 ? `${(totalCorrect / totalAttempts) * 100}%` : '0%' }}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-500">
                   {totalCorrect} / {totalAttempts} correct ({totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0}%)
                 </p>
               </div>
 
               {/* Section Heading */}
-              <p className="text-xs text-center font-semibold text-gray-500 mt-2">Top 3 Topics</p>
+              <p className="text-xs text-center font-semibold text-gray-500 dark:text-gray-100 mt-2">Top 3 Topics</p>
 
               {/* Top Nodes */}
               {topNodes.map((n, idx) => (
                 <div key={idx}>
-                  <p className="font-medium truncate">{n.label}</p>
+                  <p className="font-medium truncate text-gray-800 dark:text-gray-100">{n.label}</p>
                   <div className="w-full h-2 bg-gray-200 rounded overflow-hidden mb-1">
                     <div
                       className="h-full bg-indigo-500"
                       style={{ width: `${(n.correct / n.attempts) * 100}%` }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs  dark:text-gray-500">
                     {n.correct} / {n.attempts} correct ({Math.round((n.correct / n.attempts) * 100)}%)
                   </p>
                 </div>

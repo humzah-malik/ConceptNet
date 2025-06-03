@@ -10,6 +10,7 @@ import {
 import jsPDF from 'jspdf';
 import { BASE_URL } from '../api';
 import Layout from '../components/Layout';
+import useIsDarkMode from '../hooks/useIsDarkMode';
 
 export default function Gallery() {
   const [maps, setMaps] = useState([]);
@@ -24,7 +25,7 @@ export default function Gallery() {
   const cardRefs = useRef({});
   const [renderingExport, setRenderingExport] = useState(null);
   const [renderFormat, setRenderFormat] = useState(null);
-
+  const isDark = useIsDarkMode();
   // 1️⃣ Load maps (and migrate if needed)
   useEffect(() => {
     (async () => {
@@ -134,15 +135,27 @@ export default function Gallery() {
     <Layout>
     <div className="min-h-screen">
       {/* ─── TopBar ───────────────────────────────────────────────────────── */}
-      <div className="flex items-center px-4 py-3 bg-transparent shadow-none backdrop-blur-md">
-        <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-          <HiArrowLeft className="w-6 h-6 text-gray-700 dark:text-white" />
-        </button>
-        <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-          <HiHome className="w-6 h-6 text-gray-700 dark:text-white" />
-        </button>
-        <h1 className="flex-1 text-center text-xl font-semibold text-black dark:text-white">My Maps</h1>
-        <div className="w-8" />
+      <div className="relative flex items-center px-4 py-3 bg-transparent shadow-none backdrop-blur-md">
+        {/* LEFT BUTTONS:*/}
+        <div className="absolute left-4 flex space-x-2">
+          <button
+            onClick={() => navigate('/')}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+          >
+            <HiArrowLeft className="w-6 h-6 text-gray-700 dark:text-white" />
+          </button>
+          <button
+            onClick={() => navigate('/')}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+          >
+            <HiHome className="w-6 h-6 text-gray-700 dark:text-white" />
+          </button>
+        </div>
+
+        {/* CENTERED TITLE:*/}
+        <h1 className="mx-auto text-xl font-semibold text-black dark:text-white">
+          My Maps
+        </h1>
       </div>
 
       {/* ─── Search + Tag Filter ──────────────────────────────────────────── */}
@@ -153,7 +166,12 @@ export default function Gallery() {
             value={search}
             onChange={handleSearch}
             placeholder="Search by map title..."
-            className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full max-w-md px-4 py-2 rounded-md shadow-sm
+  border border-gray-300 dark:border-gray-600
+  bg-white dark:bg-[#1a1f23]
+  text-gray-800 dark:text-gray-100
+  placeholder:text-gray-400 dark:placeholder:text-gray-500
+  focus:ring-2 focus:ring-indigo-500 transition-colors"
           />
         </div>
 
@@ -172,7 +190,11 @@ export default function Gallery() {
                 setFiltered(base.filter(m => (m.tags || []).includes(tag)));
               }
             }}
-            className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-200"
+            className="w-full max-w-xs px-3 py-2 rounded-md shadow-sm
+  border border-gray-300 dark:border-gray-600
+  bg-white dark:bg-[#1a1f23]
+  text-gray-800 dark:text-gray-100
+  focus:ring-2 focus:ring-indigo-500 transition-colors"
           >
             <option value="">All Tags</option>
             {Array.from(new Set(maps.flatMap(m => (m.tags || [])))).map(tag => (
@@ -205,12 +227,15 @@ export default function Gallery() {
                 onClick={() => setSelectedId(map.id)}
                 onDoubleClick={() => navigate(`/map/${map.id}`)}
                 className={`
-                    bg-white rounded-xl border border-gray-100 shadow-md
-                    transition-transform duration-200 ease-in-out
-                    hover:shadow-lg hover:scale-[1.01]
-                    p-5 flex flex-col justify-between relative z-0 overflow-visible
-                    ${selectedId === map.id ? 'ring-2 ring-indigo-400/70' : ''}
-                  `}                  
+                rounded-xl border shadow-md p-5 flex flex-col justify-between relative
+                ${openMenuId === map.id ? 'z-50' : 'z-0'}    /* ⏫ bump z when menu is open */
+                overflow-visible
+                bg-white dark:bg-[#0f1a1e]
+                border-gray-200 dark:border-gray-600
+                text-gray-800 dark:text-gray-100
+                transition-transform duration-200 hover:scale-[1.01] hover:shadow-lg
+                ${selectedId === map.id ? 'ring-2 ring-indigo-400/70' : ''}
+              `}
               >
                 <div className="flex justify-between items-center mb-1">
                   <h3
@@ -242,14 +267,13 @@ export default function Gallery() {
                     let codeSum = 0;
                     for (let c of key) { codeSum += c.charCodeAt(0); }
                     const hue = codeSum % 360;
-                    const background = `hsl(${hue}, 70%, 90%)`;
-                    const border = `hsl(${hue}, 60%, 70%)`;
-
+                    const background = `hsl(${hue}, 70%, ${isDark ? '25%' : '90%'}  )`;
+                    const border = `hsl(${hue}, 60%, ${isDark ? '45%' : '70%'})`;
                     return (
                       <span
                         key={tag}
                         style={{ backgroundColor: background, borderColor: border }}
-                        className="px-2 py-0.5 text-xs rounded-full border"
+                        className="px-2 py-0.5 text-xs rounded-full border text-gray-900 dark:text-gray-100"
                       >
                         {tag}
                       </span>
@@ -260,13 +284,16 @@ export default function Gallery() {
                 {openMenuId === map.id && (
                   <div
                     ref={el => (menuRefs.current[map.id] = el)}
-                    className="absolute top-10 right-5 bg-white border border-gray-200 shadow-lg rounded-md z-[998] w-40 text-sm"
+                    className="absolute top-10 right-5 
+    bg-white dark:bg-gray-800
+    border border-gray-200 dark:border-gray-600
+    shadow-lg rounded-md z-[9999] w-40 text-sm
+    text-gray-900 dark:text-gray-100"
                   >
-
 
                     {/* Edit Tags (new) */}
                     <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => {
                         setOpenMenuId(null);
                         const answer = window.prompt(
@@ -306,28 +333,35 @@ export default function Gallery() {
                       onMouseEnter={() => setExportHoveredId(map.id)}
                       onMouseLeave={() => setExportHoveredId(null)}
                     >
-                      <button className="w-full text-left px-4 py-2 hover:bg-gray-100">
+                      <button className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <HiDownload className="inline mr-2" /> Export
                       </button>
                       {exportHoveredId === map.id && (
                         <div className="absolute top-0 left-full ml-1 
-                        bg-white border border-gray-200 shadow-xl 
-                        rounded-md text-sm w-28 z-[1001]">                   
+                        bg-white dark:bg-gray-800
+                        border border-gray-200 dark:border-gray-600
+                        shadow-lg rounded-md text-sm
+                        w-20    /* narrower than w-28 */
+                        z-50   /* safe above siblings, since parent card is z-50 */
+                        overflow-hidden">                 
                           <button
                             onClick={() => handleExport(map.graph, 'png')}
-                            className="block px-3 py-1 hover:bg-gray-100"
+                            className="w-full px-2 py-1 
+                            hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
                             PNG
                           </button>
                           <button
                             onClick={() => handleExport(map.graph, 'pdf')}
-                            className="block px-3 py-1 hover:bg-gray-100"
+                            className="w-full px-2 py-1 
+                            hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
                             PDF
                           </button>
                           <button
                             onClick={() => handleExport(map.graph, 'jpg')}
-                            className="block px-3 py-1 hover:bg-gray-100"
+                            className="w-full px-2 py-1 
+                            hover:bg-gray-100 dark:hover:bg-gray-700"
                           >
                             JPG
                           </button>
@@ -337,7 +371,7 @@ export default function Gallery() {
 
                     {/* Delete */}
                     <button
-                      className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => handleDelete(map.id)}
                     >
                       <HiTrash className="inline mr-2" /> Delete

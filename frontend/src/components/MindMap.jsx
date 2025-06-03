@@ -144,10 +144,12 @@ export default function MindMap({ graph, onNodeClick, setGraph, searchTerm }) {
           to: { enabled: true, scaleFactor: 1.0, type: 'triangle' },
         },
         font: {
-          color: isDarkMode ? '#e2e8f0' : '#343434', // same as node text
-          size: 12,
+          color: isDarkMode ? '#f1f5f9' : '#1e293b', // slate-100 / slate-800
+          size: 14,
           face: 'arial',
           align: 'middle',
+          strokeWidth: 2,
+          strokeColor: isDarkMode ? '#0f172a' : '#ffffff', // dark: slate-900, light: white
         },
       },
       interaction: {

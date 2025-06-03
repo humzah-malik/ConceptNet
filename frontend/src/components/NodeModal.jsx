@@ -93,7 +93,14 @@ export default function NodeModal({ node, onClose, graphId }) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 50 }}
         transition={{ duration: 0.25 }}
-        className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 overflow-y-auto max-h-[90vh] relative"
+        className="
+  bg-white dark:bg-[#0f1a1e]
+  border border-gray-200 dark:border-gray-600
+  text-gray-800 dark:text-gray-100
+  rounded-2xl shadow-lg
+  w-full max-w-3xl p-6 overflow-y-auto max-h-[90vh] relative
+  transition-colors duration-300
+"
       >
         {/* Close button */}
         <button
@@ -107,7 +114,9 @@ export default function NodeModal({ node, onClose, graphId }) {
         {stage === 'summary' && (
           <div>
             <h2 className="text-2xl font-semibold mb-4">{node.label}</h2>
-            <p className="text-gray-700 whitespace-pre-wrap mb-6">{node.summary}</p>
+            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap mb-6">
+              {node.summary}
+            </p>
 
             {quiz.length > 0 && (
                 <div className="flex items-center space-x-4 mt-4">
@@ -129,7 +138,7 @@ export default function NodeModal({ node, onClose, graphId }) {
                     const accuracy = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
 
                     return (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
                         {correct} / {attempts} correct ({accuracy}%)
                         </span>
                     );
@@ -175,9 +184,9 @@ export default function NodeModal({ node, onClose, graphId }) {
                     disabled={submitted}
                     className={`
                       w-full flex items-center px-4 py-2 border rounded transition
-                      ${selected === idx ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}
-                      ${isCorrect ? 'border-green-500 bg-green-50' : ''}
-                      ${isWrong   ? 'border-red-500 bg-red-50'   : ''}
+                      ${selected === idx ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : 'border-gray-300 dark:border-gray-600'}
+${isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-700/30' : ''}
+${isWrong   ? 'border-red-500 bg-red-50 dark:bg-red-700/30'   : ''}
                     `}
                   >
                     {isCorrect && <HiCheck className="text-green-600 mr-2" />}
