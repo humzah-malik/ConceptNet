@@ -228,7 +228,7 @@ app.add_middleware(
         "https://mindmapper-1.vercel.app",      
         "https://mindmapper-crll.onrender.com",  
         "https://xn--mindmapperpvw8-f72h.onrender.com",
-        "https://conceptnet.vercel.app/"
+        "https://conceptnet.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
