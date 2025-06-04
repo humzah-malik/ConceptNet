@@ -12,6 +12,12 @@ function sleep(ms) {
   return new Promise(res => setTimeout(res, ms))
 }
 
+function incrementMetric(key) {
+  const count = parseInt(localStorage.getItem(key) || '0', 10)
+  localStorage.setItem(key, (count + 1).toString())
+}
+
+
 export default function NewMap() {
   const [text, setText] = useState('')
   const [uploadedFile, setUploadedFile] = useState(null)
@@ -71,11 +77,13 @@ export default function NewMap() {
     const cached = localStorage.getItem(hash)
     if (cached) {
       graph = JSON.parse(cached)
+      incrementMetric('mapsFromLocalCache')
     } else {
       try {
         const supaRes = await fetch(`${BASE_URL}/get-cached-graph/${hash}`)
         if (supaRes.ok) {
           graph = await supaRes.json()
+          incrementMetric('mapsFromSupabaseCache')
         }
       } catch (e) {
         console.error(e)
@@ -99,6 +107,15 @@ export default function NewMap() {
       }
       graph = await genRes.json()
       localStorage.setItem(hash, JSON.stringify(graph))
+      incrementMetric('mapsFromServer')
+    }
+    const local = parseInt(localStorage.getItem('mapsFromLocalCache') || '0')
+    const supa = parseInt(localStorage.getItem('mapsFromSupabaseCache') || '0')
+    const fresh = parseInt(localStorage.getItem('mapsFromServer') || '0')
+    const total = local + supa + fresh
+    if (total > 0) {
+      const reduction = ((local + supa) / total) * 100
+      localStorage.setItem('mapCacheEfficiency', `${reduction.toFixed(1)}%`)
     }
 
     // STEP 4: Done!
