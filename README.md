@@ -7,7 +7,7 @@ Built for students who think visually, learn deeply, and study smarter.
 
 ---
 
-## ✨ Features at a Glance
+## ✨ Features
 
 ### 🌟 Landing Page
 ![Landing Page](./screenshots/landing.png)  
