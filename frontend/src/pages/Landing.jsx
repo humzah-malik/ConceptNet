@@ -8,7 +8,7 @@ export default function Landing() {
     <Layout>
       <ParticlesBackground />
       <div className="flex flex-col items-center justify-center h-screen text-center space-y-6">
-        <h1 className="text-5xl font-extrabold text-black dark:text-white">ConceptNet</h1>
+        <h1 className="text-5xl font-bold tracking-tight text-black dark:text-white">ConceptNet</h1>
         <p className="text-black dark:text-white text-lg max-w-xl">
         Transform transcripts into interactive learning maps
         </p>

@@ -10,6 +10,11 @@ import './index.css'
 import { SpeedInsights } from '@vercel/speed-insights/react'
 import { Analytics } from '@vercel/analytics/react'
 
+const fontLink = document.createElement('link')
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap'
+fontLink.rel = 'stylesheet'
+document.head.appendChild(fontLink)
+
 const storedTheme = localStorage.getItem('theme')
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
 

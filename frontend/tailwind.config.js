@@ -18,7 +18,7 @@ export default {
         glass: 'rgba(255, 255, 255, 0.1)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Sora', 'system-ui', 'sans-serif'],
       },
       animation: {
         'gradient-x': 'gradient-x 20s ease infinite',
