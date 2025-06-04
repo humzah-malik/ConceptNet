@@ -74,7 +74,7 @@ export default function MapView() {
 
       {/* Center Title */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-40">
-        <h1 className="text-lg font-semibold text-gray-800 dark:text-white">MindMapper</h1>
+        <h1 className="text-lg font-semibold text-gray-800 dark:text-white">ConceptNet</h1>
       </div>
 
       {/* Right Side Buttons */}

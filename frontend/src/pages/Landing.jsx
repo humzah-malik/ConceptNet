@@ -8,9 +8,9 @@ export default function Landing() {
     <Layout>
       <ParticlesBackground />
       <div className="flex flex-col items-center justify-center h-screen text-center space-y-6">
-        <h1 className="text-5xl font-extrabold text-black dark:text-white">MindMapper</h1>
+        <h1 className="text-5xl font-extrabold text-black dark:text-white">ConceptNet</h1>
         <p className="text-black dark:text-white text-lg max-w-xl">
-          Turn any transcript or PDF into a smart concept map with summaries and quizzes.
+        Transform transcripts into interactive learning maps
         </p>
         <div className="space-x-4">
         <Link to="/newmap" className="btn btn-indigo">Create Map</Link>
