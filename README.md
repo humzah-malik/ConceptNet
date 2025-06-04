@@ -40,14 +40,6 @@ Clean, minimal entry point with animated particles and light/dark mode toggle.
 
 ---
 
-### 🧾 Node Summary + Quiz
-![Quiz Modal](./screenshots/modal.png)
-
-- Node modal shows 4–6 sentence summary
-- MCQ quiz with shuffle, visual feedback, and local stats
-
----
-
 ### 🗃️ Gallery View
 ![Gallery](./screenshots/gallery.png)
 
@@ -55,6 +47,14 @@ Clean, minimal entry point with animated particles and light/dark mode toggle.
 - Search + tag filtering
 - Quick export or delete
 - Inline tag editing
+
+---
+
+### 🧾 Node Summary + Quiz
+![Quiz Modal](./screenshots/modal.png)
+
+- Node modal shows 4–6 sentence summary
+- MCQ quiz with shuffle, visual feedback, and local stats
 
 ---
 
