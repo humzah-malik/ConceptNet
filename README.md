@@ -70,7 +70,7 @@ Clean, minimal entry point with animated particles and light/dark mode toggle.
 
 ## 🌱 Motivation
 As a visual learner, I often like to extract the big picture before diving deep into topics.
-Built ConceptNet was built to combine:
+Built ConceptNet to combine:
 - 🧾 structured summaries
 - ❓ quick self-testing
 - 🗺️ visual memory retention
