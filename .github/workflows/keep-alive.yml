@@ -9,5 +9,12 @@ jobs:
   ping-backend:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Render
-        run: curl --silent --fail https://mindmapper-crll.onrender.com/ping >/dev/null
+      - name: Ping Render root (with retries)
+        run: |
+          set -e
+          URL="https://mindmapper-crll.onrender.com/"
+          # Try up to 4 times with small delays to survive cold starts
+          curl --silent --fail --location \
+               --retry 4 --retry-delay 5 --max-time 25 \
+               "$URL" >/dev/null
+          echo "✅ Warmed: $URL"
