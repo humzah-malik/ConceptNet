@@ -2,9 +2,8 @@ name: Keep Render Backend Alive
 
 on:
   schedule:
-    # Run every 10 minutes
     - cron: '*/10 * * * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   ping-backend:
@@ -15,10 +14,8 @@ jobs:
         run: |
           echo "Pinging backend to keep it alive..."
           
-          # Ping the backend endpoint
           response=$(curl -s -w "\nHTTP_STATUS:%{http_code}\nTIME:%{time_total}s" https://mindmapper-crll.onrender.com)
           
-          # Extract response body and status
           body=$(echo "$response" | head -n 1)
           status=$(echo "$response" | grep "HTTP_STATUS:" | cut -d: -f2)
           time=$(echo "$response" | grep "TIME:" | cut -d: -f2)
@@ -27,7 +24,6 @@ jobs:
           echo "Status: $status"
           echo "Response Time: ${time}s"
           
-          # Check if the request was successful
           if [ "$status" = "200" ]; then
             echo "✅ Backend is alive and responding!"
           else
